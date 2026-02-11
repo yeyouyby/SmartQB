@@ -9,6 +9,7 @@ using SmartQB.Core.Interfaces;
 using SmartQB.Infrastructure.Data;
 using SmartQB.Infrastructure.Services;
 using SmartQB.UI.ViewModels;
+using SmartQB.UI.Views;
 
 namespace SmartQB.UI;
 
@@ -28,8 +29,6 @@ public partial class App : Application
             {
                 // Core & Infrastructure Services
                 services.AddSingleton<IVersionService, VersionService>();
-
-                // PDF Service
                 services.AddSingleton<IPdfService, PdfService>();
 
                 // LLM Service
@@ -45,9 +44,14 @@ public partial class App : Application
                 services.AddDbContext<SmartQBDbContext>(options =>
                     options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection")));
 
-                // UI Services
-                services.AddSingleton<MainWindow>();
+                // ViewModels
                 services.AddSingleton<MainViewModel>();
+                services.AddSingleton<IngestionViewModel>();
+                services.AddSingleton<QuestionBankViewModel>();
+                services.AddSingleton<PaperCompositionViewModel>();
+
+                // Windows & Views
+                services.AddSingleton<MainWindow>();
             })
             .Build();
     }
@@ -60,8 +64,6 @@ public partial class App : Application
         using (var scope = AppHost.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
-            // EnsureCreated works well for prototyping. For production, Migrations are better.
-            // But adhering to the task list, this is "Configure EF Core + SQLite".
             dbContext.Database.EnsureCreated();
         }
 
