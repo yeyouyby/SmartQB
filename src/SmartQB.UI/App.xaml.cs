@@ -28,6 +28,9 @@ public partial class App : Application
             {
                 // Core & Infrastructure Services
                 services.AddSingleton<IVersionService, VersionService>();
+                services.AddSingleton<ILLMService, OpenAiLlmService>();
+                services.AddSingleton<IPdfService, PdfiumService>();
+                services.AddSingleton<IVectorDbService, ChromaVectorService>();
 
                 // Database
                 services.AddDbContext<SmartQBDbContext>(options =>
