@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ public partial class App : Application
         AppHost = Host.CreateDefaultBuilder()
             .ConfigureAppConfiguration((context, config) =>
             {
-                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.SetBasePath(AppContext.BaseDirectory);
                 config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             })
             .ConfigureServices((context, services) =>
