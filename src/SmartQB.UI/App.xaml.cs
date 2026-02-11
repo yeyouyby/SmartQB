@@ -29,6 +29,18 @@ public partial class App : Application
                 // Core & Infrastructure Services
                 services.AddSingleton<IVersionService, VersionService>();
 
+                // PDF Service
+                services.AddSingleton<IPdfService, PdfService>();
+
+                // LLM Service
+                services.AddSingleton<ILLMService>(sp =>
+                {
+                    var config = sp.GetRequiredService<IConfiguration>();
+                    var apiKey = config["AI:ApiKey"] ?? throw new InvalidOperationException("AI:ApiKey is missing");
+                    var modelId = config["AI:ModelId"] ?? "gpt-4o";
+                    return new LLMService(apiKey, modelId);
+                });
+
                 // Database
                 services.AddDbContext<SmartQBDbContext>(options =>
                     options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection")));
@@ -43,6 +55,15 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         await AppHost!.StartAsync();
+
+        // Ensure Database is Created
+        using (var scope = AppHost.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
+            // EnsureCreated works well for prototyping. For production, Migrations are better.
+            // But adhering to the task list, this is "Configure EF Core + SQLite".
+            dbContext.Database.EnsureCreated();
+        }
 
         var startupForm = AppHost.Services.GetRequiredService<MainWindow>();
         startupForm.Show();
