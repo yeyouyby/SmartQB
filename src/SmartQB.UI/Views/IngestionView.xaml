@@ -1,0 +1,52 @@
+<UserControl x:Class="SmartQB.UI.Views.IngestionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SmartQB.UI.Views"
+             xmlns:vm="clr-namespace:SmartQB.UI.ViewModels"
+             d:DataContext="{d:DesignInstance Type=vm:IngestionViewModel}"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Drop Area -->
+        <Border Grid.Row="0" AllowDrop="True" Drop="OnDrop" Background="#F9F9F9" BorderBrush="#CCCCCC" BorderThickness="2" CornerRadius="8" Margin="20">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Drag PDF files here to ingest" FontSize="24" FontWeight="SemiBold" Foreground="#555" HorizontalAlignment="Center"/>
+                <TextBlock Text="Files will be processed by AI automatically" FontSize="14" Foreground="#888" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Processed List -->
+        <Grid Grid.Row="0" Margin="20" Visibility="{Binding ProcessedQuestions.Count, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}">
+             <!-- Ideally hide drop area or show list below/overlay. For simplicity, keeping drop area visible always but maybe smaller or toggle views.
+                  Actually, let's just show the list on the right or below if there are items.
+                  But for now, I'll stick to a simple list below the drop area if I change RowDefinitions. -->
+        </Grid>
+
+        <!-- Status Bar / Progress -->
+        <Border Grid.Row="1" Background="#EEEEEE" Padding="10">
+            <StackPanel>
+                <TextBlock Text="{Binding StatusMessage}" Margin="0,0,0,5"/>
+                <ProgressBar Value="{Binding Progress}" Height="10" Maximum="100"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Busy Overlay -->
+        <Grid Grid.RowSpan="2" Background="#80000000" Visibility="{Binding IsProcessing, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Processing..." Foreground="White" FontSize="24" FontWeight="Bold"/>
+                <ProgressBar IsIndeterminate="True" Width="200" Height="20" Margin="0,20,0,0"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
