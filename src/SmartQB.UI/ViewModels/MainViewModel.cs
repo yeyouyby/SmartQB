@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartQB.Core.Interfaces;
+using System.Threading.Tasks;
 
 namespace SmartQB.UI.ViewModels;
 
@@ -36,13 +37,20 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Navigate(string viewName)
+    private async Task NavigateAsync(string viewName)
     {
         switch (viewName)
         {
-            case "Ingestion": CurrentViewModel = IngestionVM; break;
-            case "QuestionBank": CurrentViewModel = QuestionBankVM; break;
-            case "Composition": CurrentViewModel = PaperCompositionVM; break;
+            case "Ingestion":
+                CurrentViewModel = IngestionVM;
+                break;
+            case "QuestionBank":
+                CurrentViewModel = QuestionBankVM;
+                await QuestionBankVM.InitializeAsync();
+                break;
+            case "Composition":
+                CurrentViewModel = PaperCompositionVM;
+                break;
         }
     }
 }

@@ -27,8 +27,17 @@ public partial class QuestionBankViewModel : ObservableObject
     public QuestionBankViewModel(IServiceScopeFactory scopeFactory)
     {
         _scopeFactory = scopeFactory;
-        // Load initial data (fire and forget)
-        _ = Task.Run(() => LoadQuestionsAsync());
+        // Do not auto-load in constructor. Call InitializeAsync explicitly.
+    }
+
+    public async Task InitializeAsync()
+    {
+        // Only load if empty, or enforce fresh load? For simplicity, just load.
+        // If we want to avoid re-loading every time we switch views, check count.
+        if (Questions.Count == 0)
+        {
+            await LoadQuestionsAsync();
+        }
     }
 
     [RelayCommand]
@@ -54,6 +63,9 @@ public partial class QuestionBankViewModel : ObservableObject
 
             var list = await query.OrderByDescending(q => q.Id).Take(100).ToListAsync();
 
+            // Ensure UI update on dispatcher thread if called from background,
+            // but usually this is called from UI (SearchCommand or InitializeAsync in Nav).
+            // To be safe and compatible with potential background calls:
             App.Current.Dispatcher.Invoke(() =>
             {
                 Questions.Clear();

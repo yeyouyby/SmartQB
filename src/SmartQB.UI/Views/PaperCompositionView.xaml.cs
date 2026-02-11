@@ -23,10 +23,11 @@ public partial class PaperCompositionView : UserControl, IRecipient<PrintHtmlMes
         try
         {
             await PreviewWebView.EnsureCoreWebView2Async();
-            PreviewWebView.NavigateToString(message.Value);
 
-            // Wait for navigation to complete before printing
+            // Subscribe before navigating to avoid race conditions
             PreviewWebView.NavigationCompleted += OnNavigationCompleted;
+
+            PreviewWebView.NavigateToString(message.Value);
         }
         catch (Exception ex)
         {

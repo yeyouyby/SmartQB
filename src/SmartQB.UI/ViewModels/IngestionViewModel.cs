@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SmartQB.Core.Entities;
 using SmartQB.Core.Interfaces;
@@ -49,13 +50,29 @@ public partial class IngestionViewModel : ObservableObject
 
         try
         {
-            await Task.Run(async () =>
+            // Calculate total pages upfront
+            var filePageCounts = new Dictionary<string, int>();
+            int totalPages = 0;
+
+            foreach (var path in filePaths)
             {
-                foreach (var filePath in filePaths)
-                {
-                    await ProcessSingleFileAsync(filePath);
-                }
-            });
+                // PDF processing might be heavy, but getting page count is usually fast.
+                // However, DocLib instance creation might take a moment.
+                // We wrap this in Task.Run if needed, but for now let's assume it's fast enough or we accept a small freeze.
+                // Actually, let's wrap it to be safe.
+                int pages = await Task.Run(() => _pdfService.GetPageCount(path));
+                filePageCounts[path] = pages;
+                totalPages += pages;
+            }
+
+            int processedPages = 0;
+
+            foreach (var filePath in filePaths)
+            {
+                var pageCount = filePageCounts[filePath];
+                await ProcessSingleFileAsync(filePath, pageCount, processedPages, totalPages);
+                processedPages += pageCount;
+            }
 
             StatusMessage = "Ingestion complete.";
         }
@@ -70,21 +87,19 @@ public partial class IngestionViewModel : ObservableObject
         }
     }
 
-    private async Task ProcessSingleFileAsync(string filePath)
+    private async Task ProcessSingleFileAsync(string filePath, int pageCount, int previouslyProcessedPages, int totalPages)
     {
         var fileName = Path.GetFileName(filePath);
-        UpdateStatus($"Processing {fileName}...");
-
-        int pageCount = _pdfService.GetPageCount(filePath);
+        StatusMessage = $"Processing {fileName}...";
 
         for (int i = 0; i < pageCount; i++)
         {
-            UpdateStatus($"Processing {fileName} - Page {i + 1}/{pageCount}...");
+            StatusMessage = $"Processing {fileName} - Page {i + 1}/{pageCount}...";
 
-            // 1. Render Page
-            var imageBytes = await _pdfService.RenderPageAsync(filePath, i);
+            // 1. Render Page (CPU Bound - offload to Task.Run)
+            var imageBytes = await Task.Run(() => _pdfService.RenderPageAsync(filePath, i));
 
-            // 2. Analyze with LLM
+            // 2. Analyze with LLM (I/O Bound)
             var prompt = @"
 You are a smart assistant that extracts exam questions from images.
 Identify the question stem, options (if any), answer, and parsing.
@@ -107,12 +122,14 @@ Do not include any markdown formatting (like ```json) in the response, just the 
             // 3. Parse JSON
             var questions = ParseLlmResponse(jsonResponse);
 
-            // 4. Save to DB
+            // 4. Save to DB (Batch per page)
             if (questions.Count > 0)
             {
                 using (var scope = _scopeFactory.CreateScope())
                 {
                     var db = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
+
+                    var newQuestions = new List<Question>();
 
                     foreach (var qDto in questions)
                     {
@@ -121,7 +138,7 @@ Do not include any markdown formatting (like ```json) in the response, just the 
                         {
                             foreach (var tagName in qDto.Tags)
                             {
-                                var tag = db.Tags.FirstOrDefault(t => t.Name == tagName);
+                                var tag = await db.Tags.FirstOrDefaultAsync(t => t.Name == tagName);
                                 if (tag == null)
                                 {
                                     tag = new Tag { Name = tagName };
@@ -140,16 +157,26 @@ Do not include any markdown formatting (like ```json) in the response, just the 
                         };
 
                         db.Questions.Add(question);
-                        await db.SaveChangesAsync();
+                        newQuestions.Add(question);
+                    }
 
-                        // Sync to UI
-                        App.Current.Dispatcher.Invoke(() => ProcessedQuestions.Add(question));
+                    await db.SaveChangesAsync();
+
+                    // Sync to UI
+                    foreach (var q in newQuestions)
+                    {
+                         // We are on UI thread (mostly), but just to be safe if called from non-UI context in future refactors.
+                         // However, since we removed Task.Run from ProcessFilesAsync, we are on the Captured Context (UI Thread)
+                         // because ConfigureAwait(true) is default.
+                         // So we can directly add to ObservableCollection.
+                         ProcessedQuestions.Add(q);
                     }
                 }
             }
 
             // Update Progress
-            UpdateProgress((double)(i + 1) / pageCount * 100);
+            int currentTotalProcessed = previouslyProcessedPages + i + 1;
+            Progress = (double)currentTotalProcessed / totalPages * 100;
         }
     }
 
@@ -176,16 +203,6 @@ Do not include any markdown formatting (like ```json) in the response, just the 
             // If parsing fails, maybe return raw content as a fallback or log error
             return new List<QuestionDto>();
         }
-    }
-
-    private void UpdateStatus(string message)
-    {
-        App.Current.Dispatcher.Invoke(() => StatusMessage = message);
-    }
-
-    private void UpdateProgress(double value)
-    {
-        App.Current.Dispatcher.Invoke(() => Progress = value);
     }
 
     private record QuestionDto(string Content, string LogicDescriptor, double Difficulty, List<string> Tags);

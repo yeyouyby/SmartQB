@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -77,16 +78,18 @@ public partial class PaperCompositionViewModel : ObservableObject, IRecipient<Ad
         foreach (var q in Basket)
         {
             sb.AppendLine($"<div class='question'>");
-            sb.AppendLine($"<p><strong>{index}.</strong> {q.Content}</p>");
+            // Encode content to prevent XSS
+            sb.AppendLine($"<p><strong>{index}.</strong> {WebUtility.HtmlEncode(q.Content)}</p>");
 
             if (IsTeacherVersion)
             {
                 sb.AppendLine("<div class='meta'>");
-                sb.AppendLine($"<p><strong>Logic:</strong> {q.LogicDescriptor}</p>");
+                sb.AppendLine($"<p><strong>Logic:</strong> {WebUtility.HtmlEncode(q.LogicDescriptor)}</p>");
                 sb.AppendLine($"<p><strong>Difficulty:</strong> {q.Difficulty}</p>");
                 if (q.Tags != null)
                 {
-                    sb.AppendLine($"<p><strong>Tags:</strong> {string.Join(", ", q.Tags.Select(t => t.Name))}</p>");
+                    var tags = string.Join(", ", q.Tags.Select(t => t.Name));
+                    sb.AppendLine($"<p><strong>Tags:</strong> {WebUtility.HtmlEncode(tags)}</p>");
                 }
                 sb.AppendLine("</div>");
             }
