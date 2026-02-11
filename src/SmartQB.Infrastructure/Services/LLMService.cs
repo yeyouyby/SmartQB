@@ -26,7 +26,13 @@ public class LLMService : ILLMService
         messages.Add(new UserChatMessage(prompt));
 
         ClientResult<ChatCompletion> result = await _chatClient.CompleteChatAsync(messages);
-        return result.Value.Content[0].Text;
+
+        if (result?.Value?.Content == null || result.Value.Content.Count == 0)
+        {
+             throw new InvalidOperationException("Received empty or invalid response from LLM.");
+        }
+
+        return result.Value.Content[0].Text ?? string.Empty;
     }
 
     public async Task<string> AnalyzeImageAsync(byte[] imageBytes, string prompt)
@@ -40,6 +46,12 @@ public class LLMService : ILLMService
         };
 
         ClientResult<ChatCompletion> result = await _chatClient.CompleteChatAsync(messages);
-        return result.Value.Content[0].Text;
+
+        if (result?.Value?.Content == null || result.Value.Content.Count == 0)
+        {
+             throw new InvalidOperationException("Received empty or invalid response from LLM.");
+        }
+
+        return result.Value.Content[0].Text ?? string.Empty;
     }
 }

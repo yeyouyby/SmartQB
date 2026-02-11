@@ -16,25 +16,25 @@ public class PdfService : IPdfService
     }
 
     public Task<byte[]> RenderPageAsync(string filePath, int pageIndex)
+        => Task.FromResult(RenderPage(filePath, pageIndex));
+
+    private byte[] RenderPage(string filePath, int pageIndex)
     {
-        return Task.Run(() =>
-        {
-            using var docReader = DocLib.Instance.GetDocReader(filePath, new PageDimensions());
-            using var pageReader = docReader.GetPageReader(pageIndex);
+        using var docReader = DocLib.Instance.GetDocReader(filePath, new PageDimensions());
+        using var pageReader = docReader.GetPageReader(pageIndex);
 
-            var width = pageReader.GetPageWidth();
-            var height = pageReader.GetPageHeight();
-            var rawBytes = pageReader.GetImage(); // BGRA32
+        var width = pageReader.GetPageWidth();
+        var height = pageReader.GetPageHeight();
+        var rawBytes = pageReader.GetImage(); // BGRA32
 
-            using var data = SKData.CreateCopy(rawBytes);
+        using var data = SKData.CreateCopy(rawBytes);
 
-            // Docnet returns BGRA
-            var info = new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+        // Docnet returns BGRA
+        var info = new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
 
-            using var image = SKImage.FromPixels(info, data);
-            using var encodedData = image.Encode(SKEncodedImageFormat.Png, 100);
+        using var image = SKImage.FromPixels(info, data);
+        using var encodedData = image.Encode(SKEncodedImageFormat.Png, 100);
 
-            return encodedData.ToArray();
-        });
+        return encodedData.ToArray();
     }
 }
