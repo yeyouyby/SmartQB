@@ -10,11 +10,14 @@ public partial class MainViewModel : ObservableObject
     private readonly IPdfService _pdfService;
     private readonly ILLMService _llmService;
 
+    public ImportViewModel ImportVM { get; }
+
     [ObservableProperty]
     private string _version;
 
-    public MainViewModel(IVersionService versionService, IPdfService pdfService, ILLMService llmService)
+    public MainViewModel(ImportViewModel importVM, IVersionService versionService, IPdfService pdfService, ILLMService llmService)
     {
+        ImportVM = importVM;
         _versionService = versionService;
         _pdfService = pdfService;
         _llmService = llmService;
