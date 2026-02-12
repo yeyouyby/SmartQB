@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SmartQB.Core.Entities;
 using SmartQB.Core.Interfaces;
 using SmartQB.Infrastructure.Data;
@@ -13,16 +14,19 @@ public class IngestionService : IIngestionService
     private readonly IPdfService _pdfService;
     private readonly ILLMService _llmService;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<IngestionService> _logger;
 
-    public IngestionService(IPdfService pdfService, ILLMService llmService, IServiceScopeFactory scopeFactory)
+    public IngestionService(IPdfService pdfService, ILLMService llmService, IServiceScopeFactory scopeFactory, ILogger<IngestionService> logger)
     {
         _pdfService = pdfService;
         _llmService = llmService;
         _scopeFactory = scopeFactory;
+        _logger = logger;
     }
 
     public async Task ProcessPdfAsync(string filePath)
     {
+        _logger.LogInformation("Starting ingestion for file: {FilePath}", filePath);
         int pageCount = _pdfService.GetPageCount(filePath);
 
         for (int i = 0; i < pageCount; i++)
@@ -83,16 +87,17 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
 
                         dbContext.Questions.Add(question);
                         await dbContext.SaveChangesAsync();
+                        _logger.LogInformation("Successfully ingested page {PageNumber} of {FilePath}", i + 1, filePath);
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Log error (for now just console/debug)
-                Console.WriteLine($"Error processing page {i + 1}: {ex.Message}");
+                _logger.LogError(ex, "Error processing page {PageNumber} of {FilePath}", i + 1, filePath);
                 // Continue to next page
             }
         }
+        _logger.LogInformation("Finished ingestion for file: {FilePath}", filePath);
     }
 
     private string CleanJson(string response)

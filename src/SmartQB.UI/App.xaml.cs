@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SmartQB.Core.Interfaces;
 using SmartQB.Infrastructure.Data;
 using SmartQB.Infrastructure.Services;
@@ -27,6 +28,8 @@ public partial class App : Application
             .ConfigureServices((context, services) =>
             {
                 // Core & Infrastructure Services
+                services.AddLogging(configure => configure.AddDebug());
+
                 services.AddSingleton<ITaggingService, TaggingService>();
 
                 services.AddSingleton<IVectorService, VectorService>();

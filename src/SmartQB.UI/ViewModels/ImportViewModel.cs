@@ -31,7 +31,8 @@ public partial class ImportViewModel : ObservableObject
 
         try
         {
-            await Task.Run(() => _ingestionService.ProcessPdfAsync(filePath));
+            // Removed Task.Run since ProcessPdfAsync is already async and IO-bound
+            await _ingestionService.ProcessPdfAsync(filePath);
             StatusMessage = "Import completed successfully!";
         }
         catch (Exception ex)
