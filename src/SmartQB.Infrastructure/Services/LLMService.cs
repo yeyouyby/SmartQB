@@ -1,4 +1,5 @@
 using OpenAI.Chat;
+using OpenAI.Embeddings;
 using SmartQB.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,13 @@ namespace SmartQB.Infrastructure.Services;
 public class LLMService : ILLMService
 {
     private readonly ChatClient _chatClient;
+    private readonly EmbeddingClient _embeddingClient;
 
-    public LLMService(string apiKey, string modelId = "gpt-4o")
+    public LLMService(string apiKey, string modelId = "gpt-4o", string embeddingModelId = "text-embedding-3-small")
     {
-         _chatClient = new ChatClient(modelId, new ApiKeyCredential(apiKey));
+         var credential = new ApiKeyCredential(apiKey);
+         _chatClient = new ChatClient(modelId, credential);
+         _embeddingClient = new EmbeddingClient(embeddingModelId, credential);
     }
 
     public async Task<string> ChatAsync(string prompt, string? systemPrompt = null)
@@ -53,5 +57,13 @@ public class LLMService : ILLMService
         }
 
         return result.Value.Content[0].Text ?? string.Empty;
+    }
+
+    public async Task<float[]> GetEmbeddingAsync(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return Array.Empty<float>();
+
+        ClientResult<OpenAIEmbedding> result = await _embeddingClient.GenerateEmbeddingAsync(text);
+        return result.Value.ToFloats().ToArray();
     }
 }

@@ -13,4 +13,9 @@ public interface ILLMService
     /// Sends an image and a prompt to the LLM (Vision capabilities).
     /// </summary>
     Task<string> AnalyzeImageAsync(byte[] imageBytes, string prompt);
+
+    /// <summary>
+    /// Generates vector embedding for the given text.
+    /// </summary>
+    Task<float[]> GetEmbeddingAsync(string text);
 }
