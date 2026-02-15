@@ -1,5 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using SmartQB.Core.Interfaces;
+using System;
 using System.Diagnostics;
 
 namespace SmartQB.UI.ViewModels;
@@ -7,23 +10,33 @@ namespace SmartQB.UI.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IVersionService _versionService;
-    private readonly IPdfService _pdfService;
-    private readonly ILLMService _llmService;
-
-    public ImportViewModel ImportVM { get; }
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private string _version;
 
-    public MainViewModel(ImportViewModel importVM, IVersionService versionService, IPdfService pdfService, ILLMService llmService)
+    [ObservableProperty]
+    private object? _currentPage;
+
+    public MainViewModel(IVersionService versionService, IServiceProvider serviceProvider)
     {
-        ImportVM = importVM;
         _versionService = versionService;
-        _pdfService = pdfService;
-        _llmService = llmService;
+        _serviceProvider = serviceProvider;
         _version = _versionService.GetVersion();
 
-        // Verification check
-        Debug.WriteLine($"Services Injected: PDF={_pdfService != null}, LLM={_llmService != null}");
+        // Default to Library View
+        NavigateToLibrary();
+    }
+
+    [RelayCommand]
+    private void NavigateToLibrary()
+    {
+        CurrentPage = _serviceProvider.GetRequiredService<LibraryViewModel>();
+    }
+
+    [RelayCommand]
+    private void NavigateToImport()
+    {
+        CurrentPage = _serviceProvider.GetRequiredService<ImportViewModel>();
     }
 }

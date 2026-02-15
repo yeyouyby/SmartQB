@@ -36,6 +36,9 @@ public partial class App : Application
 
                 services.AddSingleton<IVersionService, VersionService>();
 
+                // Register IQuestionService with explicit implementation type
+                services.AddSingleton<IQuestionService, QuestionService>();
+
                 // PDF Service
                 services.AddSingleton<IIngestionService, IngestionService>();
 
@@ -55,6 +58,7 @@ public partial class App : Application
                     options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection")));
 
                 // UI Services
+                services.AddSingleton<LibraryViewModel>();
                 services.AddSingleton<ImportViewModel>();
 
                 services.AddSingleton<MainWindow>();

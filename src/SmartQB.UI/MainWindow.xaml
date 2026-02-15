@@ -8,16 +8,42 @@
         xmlns:views="clr-namespace:SmartQB.UI.Views"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
-        Title="SmartQB" Height="600" Width="900">
-    <Grid>
-        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,20,0,0">
-            <TextBlock Text="SmartQB - Intelligent Question Bank" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                <TextBlock Text="Version: " FontSize="12" Foreground="Gray"/>
-                <TextBlock Text="{Binding Version}" FontSize="12" Foreground="Gray"/>
-            </StackPanel>
-        </StackPanel>
+        Title="SmartQB" Height="700" Width="1100">
 
-        <views:ImportView DataContext="{Binding ImportVM}" Margin="20,100,20,20"/>
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:LibraryViewModel}">
+            <views:LibraryView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ImportViewModel}">
+            <views:ImportView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="#F3F3F3" BorderBrush="#DDD" BorderThickness="0,0,1,0">
+            <StackPanel Margin="10">
+                <TextBlock Text="SmartQB" FontSize="20" FontWeight="Bold" Margin="10,20,10,30" HorizontalAlignment="Center"/>
+
+                <Button Content="Library" Command="{Binding NavigateToLibraryCommand}"
+                        Height="40" Margin="0,0,0,10" FontSize="14"/>
+
+                <Button Content="Import" Command="{Binding NavigateToImportCommand}"
+                        Height="40" Margin="0,0,0,10" FontSize="14"/>
+
+                <StackPanel VerticalAlignment="Bottom" Margin="0,50,0,0">
+                    <TextBlock Text="Version:" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding Version}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" FontWeight="Bold"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <ContentControl Grid.Column="1" Content="{Binding CurrentPage}" />
     </Grid>
 </Window>
