@@ -24,15 +24,15 @@ SmartQB 是一个基于本地桌面的智能题库管理系统。它利用 AI (V
 Jules，请按照以下顺序实现系统。请确保遵循 `src/` 下的分层架构。
 
 ### Phase 1: 基础设施 (Infrastructure)
-- [ ] 创建 .NET 10 Solution，包含 Core, Infrastructure, UI 三个项目。
-- [ ] 在 `Infrastructure` 中实现 `IAIService`，封装 OpenAI 兼容的 API 调用。
-- [ ] 在 `Infrastructure` 中实现 PDF 解析服务，支持将 PDF 页面转为高 DPI 图片。
-- [ ] 配置 EF Core + SQLite，建立 `Question` 和 `Tag` 的实体关系。
+- [x] 创建 .NET 10 Solution，包含 Core, Infrastructure, UI 三个项目。
+- [x] 在 `Infrastructure` 中实现 `IAIService`，封装 OpenAI 兼容的 API 调用。
+- [x] 在 `Infrastructure` 中实现 PDF 解析服务，支持将 PDF 页面转为高 DPI 图片。
+- [x] 配置 EF Core + SQLite，建立 `Question` 和 `Tag` 的实体关系。
 
 ### Phase 2: 核心业务 (Core Domain)
-- [ ] 实现 **Ingestion Pipeline**：PDF -> 切图 -> AI OCR -> 结构化实体。
+- [x] 实现 **Ingestion Pipeline**：PDF -> 切图 -> AI OCR -> 结构化实体。
 - [ ] 实现 **Recursive Tagging Service**：这是核心难点。当添加新标签时，需逻辑回溯旧题库。
-- [ ] 实现 **Vector Service**：处理题目的 `LogicDescription` 嵌入与检索。
+- [x] 实现 **Vector Service**：处理题目的 `LogicDescription` 嵌入与检索。
 
 ### Phase 3: 界面交互 (WPF UI)
 - [ ] **MainLayout**: 侧边栏导航 + 内容区域。
@@ -43,3 +43,13 @@ Jules，请按照以下顺序实现系统。请确保遵循 `src/` 下的分层�
 ## 📂 文档导航
 * [产品需求文档 (PRD)](docs/PRD.md) - 了解业务细节
 * [架构设计 (Architecture)](docs/ARCHITECTURE.md) - 了解代码组织方式
+
+## 🛠️ Architecture Decisions (ADR)
+
+### ADR-001: Decoupling Image Segmentation Algorithm from SkiaSharp
+
+* **Status**: Accepted
+* **Date**: 2024-02-28
+* **Context**: The `PdfService` was calculating horizontal row ink densities and processing the segmentation math using native `SkiaSharp` APIs, intertwining domain logic with infrastructure libraries. Testing this logic required loading real images and configuring native test runners, which is error-prone.
+* **Decision**: We decoupled the domain logic by abstracting the segmentation algorithm into a platform-agnostic, pure C# static class named `ImageSegmentationLogic` in `SmartQB.Core`. The infrastructure layer (`PdfService`) now processes images to compute the row densities, and feeds a `ReadOnlySpan<int>` to the logic class.
+* **Consequences**: Memory access is optimized using `ReadOnlySpan<int>`. Core logic is perfectly testable across any platform (like CI/CD Linux runners) without needing SkiaSharp binaries. Unit tests mock the integer density arrays directly, eliminating native library runtime errors during testing.
