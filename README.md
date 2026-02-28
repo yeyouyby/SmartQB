@@ -31,7 +31,7 @@ Jules，请按照以下顺序实现系统。请确保遵循 `src/` 下的分层�
 
 ### Phase 2: 核心业务 (Core Domain)
 - [x] 实现 **Ingestion Pipeline**：PDF -> 切图 -> AI OCR -> 结构化实体。
-- [ ] 实现 **Recursive Tagging Service**：这是核心难点。当添加新标签时，需逻辑回溯旧题库。
+- [x] 实现 **Recursive Tagging Service**：这是核心难点。当添加新标签时，需逻辑回溯旧题库。
 - [x] 实现 **Vector Service**：处理题目的 `LogicDescription` 嵌入与检索。
 
 ### Phase 3: 界面交互 (WPF UI)

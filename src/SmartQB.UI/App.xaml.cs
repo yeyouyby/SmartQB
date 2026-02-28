@@ -31,6 +31,7 @@ public partial class App : Application
                 services.AddLogging(configure => configure.AddDebug());
 
                 services.AddSingleton<ITaggingService, TaggingService>();
+                services.AddSingleton<IQuestionService, QuestionService>();
 
                 services.AddSingleton<IVectorService, VectorService>();
 
@@ -59,6 +60,8 @@ public partial class App : Application
 
                 // UI Services
                 services.AddSingleton<ImportViewModel>();
+                services.AddSingleton<LibraryViewModel>();
+                services.AddSingleton<ExportViewModel>();
 
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<MainViewModel>();

@@ -9,20 +9,13 @@ using SmartQB.Infrastructure.Data;
 
 namespace SmartQB.Infrastructure.Services;
 
-public class IngestionService : IIngestionService
+public class IngestionService(IPdfService pdfService, ILLMService llmService, IServiceScopeFactory scopeFactory, ILogger<IngestionService> logger, ITaggingService taggingService) : IIngestionService
 {
-    private readonly IPdfService _pdfService;
-    private readonly ILLMService _llmService;
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ILogger<IngestionService> _logger;
-
-    public IngestionService(IPdfService pdfService, ILLMService llmService, IServiceScopeFactory scopeFactory, ILogger<IngestionService> logger)
-    {
-        _pdfService = pdfService;
-        _llmService = llmService;
-        _scopeFactory = scopeFactory;
-        _logger = logger;
-    }
+    private readonly IPdfService _pdfService = pdfService;
+    private readonly ILLMService _llmService = llmService;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly ILogger<IngestionService> _logger = logger;
+    private readonly ITaggingService _taggingService = taggingService;
 
     public async Task ProcessPdfAsync(string filePath)
     {
@@ -108,6 +101,15 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
                                 _logger.LogError(vEx, "CRITICAL: Failed to add embedding to vector index for Question Id: {QuestionId}. This item will need to be synced manually. Payload length: {EmbeddingLength}", question.Id, embedding.Length);
                             }
                         }
+
+                        // Async tagging logic
+                        _ = Task.Run(async () => {
+                            try {
+                                await _taggingService.TagQuestionAsync(question.Id);
+                            } catch (Exception ex) {
+                                _logger.LogError(ex, "Failed to auto-tag question {QuestionId}", question.Id);
+                            }
+                        });
                     }
                 }
             }

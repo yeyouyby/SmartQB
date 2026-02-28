@@ -6,20 +6,15 @@ using System.Threading.Tasks;
 
 namespace SmartQB.UI.ViewModels;
 
-public partial class ImportViewModel : ObservableObject
+public partial class ImportViewModel(IIngestionService ingestionService) : ObservableObject
 {
-    private readonly IIngestionService _ingestionService;
+    private readonly IIngestionService _ingestionService = ingestionService;
 
     [ObservableProperty]
     private string _statusMessage = "Ready to import";
 
     [ObservableProperty]
     private bool _isBusy;
-
-    public ImportViewModel(IIngestionService ingestionService)
-    {
-        _ingestionService = ingestionService;
-    }
 
     [RelayCommand]
     private async Task ProcessFileAsync(string filePath)
