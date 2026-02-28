@@ -36,6 +36,9 @@ public partial class App : Application
 
                 services.AddSingleton<IVersionService, VersionService>();
 
+                // Configuration
+                services.Configure<SmartQB.Core.Configuration.PdfExtractionOptions>(context.Configuration.GetSection("PdfExtractionOptions"));
+
                 // PDF Service
                 services.AddSingleton<IIngestionService, IngestionService>();
 

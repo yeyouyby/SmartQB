@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SmartQB.Core.Interfaces;
@@ -13,4 +14,9 @@ public interface IPdfService
     /// Renders a specific page of a PDF as a PNG image (byte array).
     /// </summary>
     Task<byte[]> RenderPageAsync(string filePath, int pageIndex);
+
+    /// <summary>
+    /// Extracts segments of a page into separate question images synchronously.
+    /// </summary>
+    List<byte[]> ExtractQuestionImages(string filePath, int pageIndex);
 }
