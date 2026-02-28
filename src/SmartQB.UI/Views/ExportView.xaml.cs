@@ -16,10 +16,10 @@ public partial class ExportView : UserControl
     public ExportView()
     {
         InitializeComponent();
-        InitializeAsync();
+        _ = InitializeAsync();
     }
 
-    private async void InitializeAsync()
+    private async Task InitializeAsync()
     {
         await WebView.EnsureCoreWebView2Async(null);
         _isWebViewInitialized = true;
