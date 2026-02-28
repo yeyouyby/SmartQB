@@ -10,20 +10,12 @@ using Microsoft.Extensions.Logging;
 
 namespace SmartQB.Infrastructure.Services;
 
-public class TaggingService : ITaggingService
+public class TaggingService(ILLMService llmService, IVectorService vectorService, IServiceScopeFactory scopeFactory, ILogger<TaggingService> logger) : ITaggingService
 {
-    private readonly ILLMService _llmService;
-    private readonly IVectorService _vectorService;
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ILogger<TaggingService> _logger;
-
-    public TaggingService(ILLMService llmService, IVectorService vectorService, IServiceScopeFactory scopeFactory, ILogger<TaggingService> logger)
-    {
-        _llmService = llmService;
-        _vectorService = vectorService;
-        _scopeFactory = scopeFactory;
-        _logger = logger;
-    }
+    private readonly ILLMService _llmService = llmService;
+    private readonly IVectorService _vectorService = vectorService;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly ILogger<TaggingService> _logger = logger;
 
     public Task BackfillTagAsync(Tag tag)
     {
@@ -128,9 +120,39 @@ Reply with strictly YES or NO.";
         return response?.Trim().ToUpper().StartsWith("YES") == true;
     }
 
-    public Task TagQuestionAsync(int questionId)
+        public async Task TagQuestionAsync(int questionId)
     {
-        // Placeholder implementation
-        return Task.CompletedTask;
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
+
+        var question = await dbContext.Questions
+            .Include(q => q.Tags)
+            .FirstOrDefaultAsync(q => q.Id == questionId);
+
+        if (question == null)
+        {
+            _logger.LogWarning("Question {QuestionId} not found for tagging.", questionId);
+            return;
+        }
+
+        // Simplistic approach: Fetch all tags (or top N by some logic, maybe vector search using question embedding vs tag definition?)
+        // The PRD mentions "当添加新标签时，需逻辑回溯旧题库", but when adding a new question, we also need to tag it.
+        // We'll fetch all tags that have definitions and ask the LLM.
+        var allTags = await dbContext.Tags.Where(t => t.Definition != null && t.Definition != "").ToListAsync();
+
+        foreach (var tag in allTags)
+        {
+            if (question.Tags.Any(t => t.Id == tag.Id)) continue;
+
+            bool isMatch = await CheckTagMatchAsync(question, tag.Name, tag.Definition!);
+
+            if (isMatch)
+            {
+                question.Tags.Add(tag);
+                _logger.LogInformation("Auto-tagged Question {QuestionId} with {TagName}", question.Id, tag.Name);
+            }
+        }
+
+        await dbContext.SaveChangesAsync();
     }
 }

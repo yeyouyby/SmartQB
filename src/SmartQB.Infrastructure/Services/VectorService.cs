@@ -12,18 +12,11 @@ using Microsoft.Extensions.Logging;
 
 namespace SmartQB.Infrastructure.Services;
 
-public class VectorService : IVectorService
+public class VectorService(ILLMService llmService, IServiceScopeFactory scopeFactory, ILogger<VectorService> logger) : IVectorService
 {
-    private readonly ILLMService _llmService;
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ILogger<VectorService> _logger;
-
-    public VectorService(ILLMService llmService, IServiceScopeFactory scopeFactory, ILogger<VectorService> logger)
-    {
-        _llmService = llmService;
-        _scopeFactory = scopeFactory;
-        _logger = logger;
-    }
+    private readonly ILLMService _llmService = llmService;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly ILogger<VectorService> _logger = logger;
 
     public Task AddVectorAsync(int questionId, float[] vector)
     {

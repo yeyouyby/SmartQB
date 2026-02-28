@@ -8,16 +8,41 @@
         xmlns:views="clr-namespace:SmartQB.UI.Views"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
-        Title="SmartQB" Height="600" Width="900">
-    <Grid>
-        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,20,0,0">
-            <TextBlock Text="SmartQB - Intelligent Question Bank" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                <TextBlock Text="Version: " FontSize="12" Foreground="Gray"/>
-                <TextBlock Text="{Binding Version}" FontSize="12" Foreground="Gray"/>
-            </StackPanel>
-        </StackPanel>
+        Title="SmartQB" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:ImportViewModel}">
+            <views:ImportView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:LibraryViewModel}">
+            <views:LibraryView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ExportViewModel}">
+            <views:ExportView />
+        </DataTemplate>
+    </Window.Resources>
 
-        <views:ImportView DataContext="{Binding ImportVM}" Margin="20,100,20,20"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="#F3F4F6" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0">
+            <StackPanel Margin="0,20,0,0">
+                <TextBlock Text="SmartQB" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding Version, StringFormat=v{0}}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+
+                <Button Content="Import PDFs" Command="{Binding NavigateCommand}" CommandParameter="Import"
+                        Margin="10,5" Padding="10" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left"/>
+                <Button Content="Question Library" Command="{Binding NavigateCommand}" CommandParameter="Library"
+                        Margin="10,5" Padding="10" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left"/>
+                <Button Content="Export Paper" Command="{Binding NavigateCommand}" CommandParameter="Export"
+                        Margin="10,5" Padding="10" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" Margin="20"/>
     </Grid>
 </Window>

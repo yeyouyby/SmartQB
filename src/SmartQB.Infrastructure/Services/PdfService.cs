@@ -14,14 +14,9 @@ using Microsoft.Extensions.Options;
 
 namespace SmartQB.Infrastructure.Services;
 
-public class PdfService : IPdfService
+public class PdfService(IOptions<PdfExtractionOptions> options) : IPdfService
 {
-    private readonly PdfExtractionOptions _options;
-
-    public PdfService(IOptions<PdfExtractionOptions> options)
-    {
-        _options = options?.Value ?? new PdfExtractionOptions();
-    }
+    private readonly PdfExtractionOptions _options = options?.Value ?? new PdfExtractionOptions();
 
     public int GetPageCount(string filePath)
     {
