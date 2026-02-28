@@ -25,6 +25,13 @@ public class VectorService : IVectorService
         _logger = logger;
     }
 
+    public Task AddVectorAsync(int questionId, float[] vector)
+    {
+        // In this implementation, the vector is already stored in SQLite within IngestionService.
+        // This method exists to satisfy the abstraction for future external vector DB integration.
+        return Task.CompletedTask;
+    }
+
     public async Task<List<Question>> SearchSimilarAsync(string query, int limit = 10)
     {
         var queryVector = await _llmService.GetEmbeddingAsync(query);

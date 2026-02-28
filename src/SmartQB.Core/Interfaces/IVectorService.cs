@@ -7,4 +7,5 @@ namespace SmartQB.Core.Interfaces;
 public interface IVectorService
 {
     Task<List<Question>> SearchSimilarAsync(string query, int limit = 10);
+    Task AddVectorAsync(int questionId, float[] vector);
 }

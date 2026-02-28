@@ -40,8 +40,8 @@ public class IngestionService : IIngestionService
                 string prompt = @"
 Analyze the provided image of a math question.
 Extract the following information and return it as a JSON object:
-- ""Content"": The question text in LaTeX/Markdown format.
-- ""LogicDescriptor"": A brief explanation of the logic or steps required to solve it.
+- ""Content"": The question text. **CRITICAL: ALL math formulas MUST be strictly converted to LaTeX format ($...$).**
+- ""LogicDescriptor"": A brief explanation of the logic or steps required to solve it (LogicPath).
 - ""Difficulty"": A number between 0.0 and 5.0 representing the difficulty level.
 
 Format:
@@ -64,10 +64,11 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
 
                 if (data != null && !string.IsNullOrWhiteSpace(data.Content))
                 {
-                    // Use a scope to get DbContext
+                    // Use a scope to get DbContext and VectorService
                     using (var scope = _scopeFactory.CreateScope())
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
+                        var vectorService = scope.ServiceProvider.GetRequiredService<IVectorService>();
 
                         // Create Question Entity
                         var question = new Question
@@ -77,16 +78,24 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
                             Difficulty = data.Difficulty
                         };
 
-                        // Generate Embedding
+                        // 1. Save to SQLite first to generate the Question ID
+                        dbContext.Questions.Add(question);
+                        await dbContext.SaveChangesAsync();
+
+                        // 2. Generate Embedding
                         string textToEmbed = !string.IsNullOrWhiteSpace(data.LogicDescriptor) ? data.LogicDescriptor : data.Content;
                         var embedding = await _llmService.GetEmbeddingAsync(textToEmbed);
+
                         if (embedding.Length > 0)
                         {
                             question.EmbeddingJson = JsonSerializer.Serialize(embedding);
+                            dbContext.Questions.Update(question);
+                            await dbContext.SaveChangesAsync();
+
+                            // 3. Immediately call IVectorService to store logic features into vector index
+                            await vectorService.AddVectorAsync(question.Id, embedding);
                         }
 
-                        dbContext.Questions.Add(question);
-                        await dbContext.SaveChangesAsync();
                         _logger.LogInformation("Successfully ingested page {PageNumber} of {FilePath}", i + 1, filePath);
                     }
                 }
