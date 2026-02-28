@@ -14,5 +14,4 @@ public partial class MainViewModel(ImportViewModel importVM, IVersionService ver
 
     [ObservableProperty]
     private string _version = versionService.GetVersion();
-
 }
