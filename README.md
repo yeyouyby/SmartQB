@@ -46,6 +46,10 @@ Jules，请按照以下顺序实现系统。请确保遵循 `src/` 下的分层�
 
 ## 🛠️ Architecture Decisions (ADR)
 
-* **[ADR-001] Decoupling Image Segmentation Algorithm from SkiaSharp**:
-  The image segmentation logic (finding question boundaries based on row pixel densities) was decoupled from the native `SkiaSharp` library. It was moved to a pure C# static class `ImageSegmentationLogic` in `SmartQB.Core`.
-  *Rationale*: This decoupling ensures that the core domain logic is platform-agnostic, memory-efficient (by using `ReadOnlySpan<int>`), and highly testable. Unit tests can now be run on any platform (e.g., CI/CD Linux runners) without dealing with native graphics library dependencies or loading real images, preventing SkiaSharp-related runtime errors during testing.
+### ADR-001: Decoupling Image Segmentation Algorithm from SkiaSharp
+
+* **Status**: Accepted
+* **Date**: 2024-02-28
+* **Context**: The `PdfService` was calculating horizontal row ink densities and processing the segmentation math using native `SkiaSharp` APIs, intertwining domain logic with infrastructure libraries. Testing this logic required loading real images and configuring native test runners, which is error-prone.
+* **Decision**: We decoupled the domain logic by abstracting the segmentation algorithm into a platform-agnostic, pure C# static class named `ImageSegmentationLogic` in `SmartQB.Core`. The infrastructure layer (`PdfService`) now processes images to compute the row densities, and feeds a `ReadOnlySpan<int>` to the logic class.
+* **Consequences**: Memory access is optimized using `ReadOnlySpan<int>`. Core logic is perfectly testable across any platform (like CI/CD Linux runners) without needing SkiaSharp binaries. Unit tests mock the integer density arrays directly, eliminating native library runtime errors during testing.

@@ -29,6 +29,8 @@ public class VectorService : IVectorService
     {
         // In this implementation, the vector is already stored in SQLite within IngestionService.
         // This method exists to satisfy the abstraction for future external vector DB integration.
+        // Explicitly logging as a no-op to avoid caller confusion since nothing is pushed externally yet.
+        _logger.LogDebug("[No-Op] AddVectorAsync called for Question {QuestionId}. Vector data is currently persisted inside SQLite alongside the entity.", questionId);
         return Task.CompletedTask;
     }
 

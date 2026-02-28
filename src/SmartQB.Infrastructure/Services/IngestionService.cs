@@ -64,13 +64,17 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
 
                 if (data != null && !string.IsNullOrWhiteSpace(data.Content))
                 {
+                    // Generate Embedding BEFORE saving to create an atomic transaction
+                    string textToEmbed = !string.IsNullOrWhiteSpace(data.LogicDescriptor) ? data.LogicDescriptor : data.Content;
+                    var embedding = await _llmService.GetEmbeddingAsync(textToEmbed);
+
                     // Use a scope to get DbContext and VectorService
                     using (var scope = _scopeFactory.CreateScope())
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
                         var vectorService = scope.ServiceProvider.GetRequiredService<IVectorService>();
 
-                        // Create Question Entity
+                        // Create Question Entity with all data
                         var question = new Question
                         {
                             Content = data.Content,
@@ -78,25 +82,32 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
                             Difficulty = data.Difficulty
                         };
 
-                        // 1. Save to SQLite first to generate the Question ID
-                        dbContext.Questions.Add(question);
-                        await dbContext.SaveChangesAsync();
-
-                        // 2. Generate Embedding
-                        string textToEmbed = !string.IsNullOrWhiteSpace(data.LogicDescriptor) ? data.LogicDescriptor : data.Content;
-                        var embedding = await _llmService.GetEmbeddingAsync(textToEmbed);
-
                         if (embedding.Length > 0)
                         {
                             question.EmbeddingJson = JsonSerializer.Serialize(embedding);
-                            dbContext.Questions.Update(question);
-                            await dbContext.SaveChangesAsync();
-
-                            // 3. Immediately call IVectorService to store logic features into vector index
-                            await vectorService.AddVectorAsync(question.Id, embedding);
                         }
 
-                        _logger.LogInformation("Successfully ingested page {PageNumber} of {FilePath}", i + 1, filePath);
+                        // 1. Save to SQLite atomically (this populates question.Id)
+                        dbContext.Questions.Add(question);
+                        await dbContext.SaveChangesAsync();
+
+                        _logger.LogInformation("Successfully ingested page {PageNumber} of {FilePath} to DB. Question Id: {QuestionId}", i + 1, filePath, question.Id);
+
+                        // 2. Safely call IVectorService to store logic features into external vector index
+                        if (embedding.Length > 0)
+                        {
+                            try
+                            {
+                                await vectorService.AddVectorAsync(question.Id, embedding);
+                                _logger.LogInformation("Successfully added embedding to vector index for Question Id: {QuestionId}", question.Id);
+                            }
+                            catch (Exception vEx)
+                            {
+                                // Log the error specifically for the vector insert so it can be retried later,
+                                // but do not crash the ingestion pipeline since SQLite write was successful.
+                                _logger.LogError(vEx, "CRITICAL: Failed to add embedding to vector index for Question Id: {QuestionId}. This item will need to be synced manually. Payload length: {EmbeddingLength}", question.Id, embedding.Length);
+                            }
+                        }
                     }
                 }
             }
