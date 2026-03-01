@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:SmartQB.UI.ViewModels"
+             xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:LibraryViewModel}"
              d:DesignHeight="600" d:DesignWidth="800">
@@ -15,7 +16,19 @@
 
         <Border Grid.Column="0" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0" Margin="0,0,10,0">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="All Questions" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                    <TextBlock Text="All Questions" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0"/>
+                        <Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" Margin="0,0,5,0" Padding="10,0"/>
+                        <Button Grid.Column="2" Content="Clear" Command="{Binding ClearSearchCommand}" Padding="10,0"/>
+                    </Grid>
+                </StackPanel>
                 <ListBox ItemsSource="{Binding Questions}" SelectedItem="{Binding SelectedQuestion}" >
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -29,18 +42,17 @@
         </Border>
 
         <Border Grid.Column="1" Padding="10">
-            <ScrollViewer>
-                <StackPanel>
-                    <TextBlock Text="Question Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <TextBlock Text="{Binding SelectedQuestion.Content}" TextWrapping="Wrap" Margin="0,0,0,20"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Question Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
 
-                    <TextBlock Text="Logic Path:" FontWeight="Bold" Margin="0,10,0,5"/>
-                    <TextBlock Text="{Binding SelectedQuestion.LogicDescriptor}" TextWrapping="Wrap" Foreground="#4B5563"/>
-
-                    <TextBlock Text="Difficulty:" FontWeight="Bold" Margin="0,10,0,5"/>
-                    <TextBlock Text="{Binding SelectedQuestion.Difficulty}" Foreground="#4B5563"/>
-                </StackPanel>
-            </ScrollViewer>
+                <Border Grid.Row="1" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4">
+                    <wv2:WebView2 x:Name="DetailsWebView" />
+                </Border>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

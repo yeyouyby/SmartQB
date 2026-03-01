@@ -17,6 +17,8 @@ public class IngestionService(IPdfService pdfService, ILLMService llmService, IS
     private readonly ILogger<IngestionService> _logger = logger;
     private readonly ITaggingService _taggingService = taggingService;
 
+    public event EventHandler<int>? QuestionIngested;
+
     public async Task ProcessPdfAsync(string filePath)
     {
         _logger.LogInformation("Starting ingestion for file: {FilePath}", filePath);
@@ -110,6 +112,8 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
                                 _logger.LogError(ex, "Failed to auto-tag question {QuestionId}", question.Id);
                             }
                         });
+
+                        QuestionIngested?.Invoke(this, question.Id);
                     }
                 }
             }
