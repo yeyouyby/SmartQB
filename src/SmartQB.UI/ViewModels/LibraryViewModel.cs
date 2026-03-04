@@ -27,7 +27,7 @@ public partial class LibraryViewModel : ObservableObject
     {
         if (System.Windows.Application.Current != null)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 _ = LoadQuestionsAsync();
             });
@@ -62,11 +62,23 @@ public partial class LibraryViewModel : ObservableObject
             return;
         }
 
-        var results = await _vectorService.SearchSimilarAsync(SearchQuery);
-        Questions.Clear();
-        foreach (var q in results)
+        try
         {
-            Questions.Add(q);
+            var results = await _vectorService.SearchSimilarAsync(SearchQuery, 10);
+            Questions.Clear();
+            if (results != null)
+            {
+                foreach (var q in results)
+                {
+                    Questions.Add(q);
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Search failed. Log error or notify UI in a real app.
+            // For now, clear the list or keep old list (we chose to clear it and wait for retry).
+            Questions.Clear();
         }
     }
 }

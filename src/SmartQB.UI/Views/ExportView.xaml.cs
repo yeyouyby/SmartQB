@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Web.WebView2.Core;
 using SmartQB.UI.ViewModels;
+using SmartQB.UI.Helpers;
 
 namespace SmartQB.UI.Views;
 
@@ -16,24 +17,36 @@ public partial class ExportView : UserControl
     public ExportView()
     {
         InitializeComponent();
-        _ = InitializeAsync();
+        Loaded += OnLoaded;
+    }
+
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        await InitializeAsync();
     }
 
     private async Task InitializeAsync()
     {
-        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        string userDataFolder = Path.Combine(appDataPath, "SmartQB", "WebView2");
-        var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
-        await WebView.EnsureCoreWebView2Async(env);
-        _isWebViewInitialized = true;
+        if (_isWebViewInitialized) return;
 
-        WebView.NavigationCompleted += (sender, args) =>
+        try
         {
-            if (_navigationTcs != null && !_navigationTcs.Task.IsCompleted)
+            var env = await WebView2Helper.GetEnvironmentAsync();
+            await WebView.EnsureCoreWebView2Async(env);
+            _isWebViewInitialized = true;
+
+            WebView.NavigationCompleted += (sender, args) =>
             {
-                _navigationTcs.SetResult(args.IsSuccess);
-            }
-        };
+                if (_navigationTcs != null && !_navigationTcs.Task.IsCompleted)
+                {
+                    _navigationTcs.SetResult(args.IsSuccess);
+                }
+            };
+        }
+        catch
+        {
+            // Initialization failed
+        }
     }
 
     private async void Preview_Click(object sender, RoutedEventArgs e)
