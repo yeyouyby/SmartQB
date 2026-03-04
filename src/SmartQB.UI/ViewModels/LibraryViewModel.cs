@@ -43,14 +43,59 @@ public partial class LibraryViewModel : ObservableObject
     [ObservableProperty]
     private string _searchQuery = string.Empty;
 
+    [ObservableProperty]
+    private ObservableCollection<Tag> _tags = new();
+
+    private Tag? _selectedTag;
+    public Tag? SelectedTag
+    {
+        get => _selectedTag;
+        set
+        {
+            if (SetProperty(ref _selectedTag, value))
+            {
+                _ = LoadQuestionsAsync();
+            }
+        }
+    }
+
+    public async Task LoadTagsAsync()
+    {
+        var tags = await _questionService.GetAllTagsAsync();
+        Tags.Clear();
+        foreach (var t in tags)
+        {
+            Tags.Add(t);
+        }
+    }
+
     public async Task LoadQuestionsAsync()
     {
         var list = await _questionService.GetAllQuestionsAsync();
         Questions.Clear();
         foreach (var q in list)
         {
+            if (SelectedTag != null)
+            {
+                bool hasTag = false;
+                foreach (var t in q.Tags)
+                {
+                    if (t.Id == SelectedTag.Id)
+                    {
+                        hasTag = true;
+                        break;
+                    }
+                }
+                if (!hasTag) continue;
+            }
             Questions.Add(q);
         }
+    }
+
+    [RelayCommand]
+    private void ClearFilter()
+    {
+        SelectedTag = null;
     }
 
     [RelayCommand]
@@ -70,6 +115,19 @@ public partial class LibraryViewModel : ObservableObject
             {
                 foreach (var q in results)
                 {
+                    if (SelectedTag != null)
+                    {
+                        bool hasTag = false;
+                        foreach (var t in q.Tags)
+                        {
+                            if (t.Id == SelectedTag.Id)
+                            {
+                                hasTag = true;
+                                break;
+                            }
+                        }
+                        if (!hasTag) continue;
+                    }
                     Questions.Add(q);
                 }
             }

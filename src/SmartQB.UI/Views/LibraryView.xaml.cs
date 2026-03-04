@@ -27,6 +27,7 @@ public partial class LibraryView : UserControl
         await InitializeAsync();
         if (DataContext is LibraryViewModel vm)
         {
+            _ = vm.LoadTagsAsync();
             _ = vm.LoadQuestionsAsync();
             vm.PropertyChanged += OnViewModelPropertyChanged;
         }
