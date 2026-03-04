@@ -21,7 +21,10 @@ public partial class ExportView : UserControl
 
     private async Task InitializeAsync()
     {
-        await WebView.EnsureCoreWebView2Async(null);
+        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string userDataFolder = Path.Combine(appDataPath, "SmartQB", "WebView2");
+        var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
+        await WebView.EnsureCoreWebView2Async(env);
         _isWebViewInitialized = true;
 
         WebView.NavigationCompleted += (sender, args) =>

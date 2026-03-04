@@ -1,0 +1,38 @@
+using Moq;
+using SmartQB.Core.Interfaces;
+using SmartQB.UI.ViewModels;
+
+namespace SmartQB.UI.Tests;
+
+public class MainViewModelTests
+{
+    [Fact]
+    public void Navigate_UpdatesCurrentViewModel()
+    {
+        // Arrange
+        var versionServiceMock = new Mock<IVersionService>();
+        versionServiceMock.Setup(vs => vs.GetVersion()).Returns("1.0.0");
+
+        var ingestionServiceMock = new Mock<IIngestionService>();
+        var importVM = new ImportViewModel(ingestionServiceMock.Object);
+
+        var questionServiceMock = new Mock<IQuestionService>();
+        var vectorServiceMock = new Mock<IVectorService>();
+        var taggingServiceMock = new Mock<ITaggingService>();
+        var libraryVM = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
+
+        var exportVM = new ExportViewModel(questionServiceMock.Object);
+
+        var mainVM = new MainViewModel(importVM, libraryVM, exportVM, versionServiceMock.Object);
+
+        // Act & Assert
+        mainVM.NavigateCommand.Execute("Library");
+        Assert.Equal(libraryVM, mainVM.CurrentViewModel);
+
+        mainVM.NavigateCommand.Execute("Export");
+        Assert.Equal(exportVM, mainVM.CurrentViewModel);
+
+        mainVM.NavigateCommand.Execute("Import");
+        Assert.Equal(importVM, mainVM.CurrentViewModel);
+    }
+}

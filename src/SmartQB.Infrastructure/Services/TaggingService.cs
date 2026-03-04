@@ -17,6 +17,8 @@ public class TaggingService(ILLMService llmService, IVectorService vectorService
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private readonly ILogger<TaggingService> _logger = logger;
 
+    public event EventHandler? QuestionProcessed;
+
     public Task BackfillTagAsync(Tag tag)
     {
         int tagId = tag.Id;
@@ -154,5 +156,7 @@ Reply with strictly YES or NO.";
         }
 
         await dbContext.SaveChangesAsync();
+
+        QuestionProcessed?.Invoke(this, EventArgs.Empty);
     }
 }
