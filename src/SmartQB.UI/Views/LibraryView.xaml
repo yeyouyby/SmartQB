@@ -16,6 +16,10 @@
         <Border Grid.Column="0" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0" Margin="0,0,10,0">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="All Questions" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" Width="200" Margin="0,0,10,0" Padding="2" />
+                    <Button Content="Search" Command="{Binding SearchCommand}" Padding="10,2" />
+                </StackPanel>
                 <ListBox ItemsSource="{Binding Questions}" SelectedItem="{Binding SelectedQuestion}" >
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -29,18 +33,7 @@
         </Border>
 
         <Border Grid.Column="1" Padding="10">
-            <ScrollViewer>
-                <StackPanel>
-                    <TextBlock Text="Question Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <TextBlock Text="{Binding SelectedQuestion.Content}" TextWrapping="Wrap" Margin="0,0,0,20"/>
-
-                    <TextBlock Text="Logic Path:" FontWeight="Bold" Margin="0,10,0,5"/>
-                    <TextBlock Text="{Binding SelectedQuestion.LogicDescriptor}" TextWrapping="Wrap" Foreground="#4B5563"/>
-
-                    <TextBlock Text="Difficulty:" FontWeight="Bold" Margin="0,10,0,5"/>
-                    <TextBlock Text="{Binding SelectedQuestion.Difficulty}" Foreground="#4B5563"/>
-                </StackPanel>
-            </ScrollViewer>
+            <wv2:WebView2 xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" x:Name="DetailsWebView" />
         </Border>
     </Grid>
 </UserControl>

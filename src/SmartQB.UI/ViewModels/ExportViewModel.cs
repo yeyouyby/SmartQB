@@ -22,7 +22,7 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
 
         var sb = new StringBuilder();
         sb.AppendLine("<!DOCTYPE html>");
-        sb.AppendLine("<html>");
+        sb.AppendLine("<html lang='en'>");
         sb.AppendLine("<head>");
         sb.AppendLine("<meta charset='utf-8'>");
         sb.AppendLine("<title>SmartQB Paper</title>");
@@ -37,29 +37,31 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
         sb.AppendLine("<script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>");
         sb.AppendLine("</head>");
         sb.AppendLine("<body>");
+        sb.AppendLine("<main>");
         sb.AppendLine("<h1>Generated Paper</h1>");
 
         int qIndex = 1;
         foreach (var q in questions)
         {
             sb.AppendLine("<div class='question'>");
-            sb.AppendLine($"<h3>Question {qIndex} (Difficulty: {q.Difficulty})</h3>");
-            // HTML encode the content but let MathJax parse LaTeX ($...$)
-            var safeContent = System.Net.WebUtility.HtmlEncode(q.Content).Replace("\n", "<br/>");
-            sb.AppendLine($"<p>{safeContent}</p>");
+            sb.AppendLine($"<h3>Question {qIndex} (Difficulty: {q.Difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)})</h3>");
+            // Do not HtmlEncode the content to let MathJax parse LaTeX ($...$)
+            var content = q.Content?.Replace("\n", "<br/>") ?? "";
+            sb.AppendLine($"<p>{content}</p>");
 
             if (includeAnswers)
             {
-                var safeAnswer = System.Net.WebUtility.HtmlEncode(q.LogicDescriptor ?? "No logic provided.").Replace("\n", "<br/>");
+                var answer = q.LogicDescriptor?.Replace("\n", "<br/>") ?? "No logic provided.";
                 sb.AppendLine("<div class='answer'>");
                 sb.AppendLine("<strong>Logic/Answer:</strong><br/>");
-                sb.AppendLine($"<p>{safeAnswer}</p>");
+                sb.AppendLine($"<p>{answer}</p>");
                 sb.AppendLine("</div>");
             }
             sb.AppendLine("</div>");
             qIndex++;
         }
 
+        sb.AppendLine("</main>");
         sb.AppendLine("</body>");
         sb.AppendLine("</html>");
 
