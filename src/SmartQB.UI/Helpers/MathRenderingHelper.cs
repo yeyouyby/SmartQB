@@ -23,11 +23,11 @@ public static class MathRenderingHelper
 
     private static void OnMathTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is Panel panel && e.NewValue is string text)
+        if (d is Panel panel)
         {
             panel.Children.Clear();
 
-            if (string.IsNullOrWhiteSpace(text))
+            if (!(e.NewValue is string text) || string.IsNullOrWhiteSpace(text))
                 return;
 
             // Simple regex to match LaTeX formulas wrapped in $...$
