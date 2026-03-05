@@ -31,7 +31,7 @@ public static class MathRenderingHelper
                 return;
 
             // Simple regex to match LaTeX formulas wrapped in $...$
-            var regex = new Regex(@"\$(.*?)\$");
+            var regex = new Regex(@"\$(.*?)\$", RegexOptions.None, TimeSpan.FromMilliseconds(500));
             var matches = regex.Matches(text);
 
             int lastIndex = 0;
