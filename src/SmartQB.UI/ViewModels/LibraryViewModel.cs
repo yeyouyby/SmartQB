@@ -3,24 +3,24 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using SmartQB.Core.Entities;
 using System.Threading.Tasks;
-
 using System;
 
 namespace SmartQB.UI.ViewModels;
 
-public partial class LibraryViewModel : ObservableObject
+public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionService, Core.Interfaces.IVectorService vectorService, Core.Interfaces.ITaggingService taggingService) : ObservableObject
 {
-    private readonly Core.Interfaces.IQuestionService _questionService;
-    private readonly Core.Interfaces.IVectorService _vectorService;
-    private readonly Core.Interfaces.ITaggingService _taggingService;
+    private readonly Core.Interfaces.IQuestionService _questionService = questionService;
+    private readonly Core.Interfaces.IVectorService _vectorService = vectorService;
+    private readonly Core.Interfaces.ITaggingService _taggingService = taggingService;
 
-    public LibraryViewModel(Core.Interfaces.IQuestionService questionService, Core.Interfaces.IVectorService vectorService, Core.Interfaces.ITaggingService taggingService)
+    // Use a parameterless init method called from View, or subscribe right here in a static context if not possible, but we can just subscribe when someone needs it or use a trick to run initialization:
+    private bool _isInitialized;
+
+    public void Initialize()
     {
-        _questionService = questionService;
-        _vectorService = vectorService;
-        _taggingService = taggingService;
-
+        if (_isInitialized) return;
         _taggingService.QuestionProcessed += OnQuestionProcessed;
+        _isInitialized = true;
     }
 
     private void OnQuestionProcessed(object? sender, EventArgs e)
@@ -134,8 +134,6 @@ public partial class LibraryViewModel : ObservableObject
         }
         catch (Exception)
         {
-            // Search failed. Log error or notify UI in a real app.
-            // For now, clear the list or keep old list (we chose to clear it and wait for retry).
             Questions.Clear();
         }
     }

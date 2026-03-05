@@ -25,6 +25,10 @@ public partial class LibraryView : UserControl
     private async void OnLoaded(object sender, System.Windows.RoutedEventArgs e)
     {
         await InitializeAsync();
+        if (DataContext is LibraryViewModel initVm)
+        {
+            initVm.Initialize();
+        }
         if (DataContext is LibraryViewModel vm)
         {
             _ = vm.LoadTagsAsync();
