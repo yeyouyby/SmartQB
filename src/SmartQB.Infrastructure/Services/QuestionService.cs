@@ -19,4 +19,12 @@ public class QuestionService(IServiceScopeFactory scopeFactory) : IQuestionServi
 
         return await dbContext.Questions.Include(q => q.Tags).AsNoTracking().ToListAsync();
     }
+
+    public async Task<List<Tag>> GetAllTagsAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
+
+        return await dbContext.Tags.AsNoTracking().ToListAsync();
+    }
 }
