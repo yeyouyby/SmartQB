@@ -4,25 +4,47 @@ using System.Collections.ObjectModel;
 using SmartQB.Core.Entities;
 using System.Threading.Tasks;
 using System;
+using System.Diagnostics;
 
 namespace SmartQB.UI.ViewModels;
 
+/// <summary>
+/// ViewModel for the Library view, handling question display, filtering, and semantic search.
+/// </summary>
 public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionService, Core.Interfaces.IVectorService vectorService, Core.Interfaces.ITaggingService taggingService) : ObservableObject
 {
     private readonly Core.Interfaces.IQuestionService _questionService = questionService;
     private readonly Core.Interfaces.IVectorService _vectorService = vectorService;
     private readonly Core.Interfaces.ITaggingService _taggingService = taggingService;
 
-    // Use a parameterless init method called from View, or subscribe right here in a static context if not possible, but we can just subscribe when someone needs it or use a trick to run initialization:
     private bool _isInitialized;
 
-    public void Initialize()
+    /// <summary>
+    /// Activates the ViewModel, subscribing to necessary background events.
+    /// Should be called when the view is loaded.
+    /// </summary>
+    public void Activate()
     {
         if (_isInitialized) return;
         _taggingService.QuestionProcessed += OnQuestionProcessed;
         _isInitialized = true;
     }
 
+    /// <summary>
+    /// Deactivates the ViewModel, unsubscribing from background events to prevent memory leaks.
+    /// Should be called when the view is unloaded.
+    /// </summary>
+    public void Deactivate()
+    {
+        if (!_isInitialized) return;
+        _taggingService.QuestionProcessed -= OnQuestionProcessed;
+        _isInitialized = false;
+    }
+
+    /// <summary>
+    /// Event handler for when a question has been processed by the tagging service.
+    /// Refreshes the question list on the UI thread.
+    /// </summary>
     private void OnQuestionProcessed(object? sender, EventArgs e)
     {
         if (System.Windows.Application.Current != null)
@@ -47,6 +69,11 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
     private ObservableCollection<Tag> _tags = new();
 
     private Tag? _selectedTag;
+
+    /// <summary>
+    /// Gets or sets the selected tag for filtering the question list.
+    /// Automatically reloads questions when changed.
+    /// </summary>
     public Tag? SelectedTag
     {
         get => _selectedTag;
@@ -59,6 +86,9 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
         }
     }
 
+    /// <summary>
+    /// Loads all available tags from the database into the observable collection.
+    /// </summary>
     public async Task LoadTagsAsync()
     {
         var tags = await _questionService.GetAllTagsAsync();
@@ -69,6 +99,9 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
         }
     }
 
+    /// <summary>
+    /// Loads all questions from the database, applying the currently selected tag filter if any.
+    /// </summary>
     public async Task LoadQuestionsAsync()
     {
         var list = await _questionService.GetAllQuestionsAsync();
@@ -92,12 +125,19 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
         }
     }
 
+    /// <summary>
+    /// Clears the currently selected tag filter.
+    /// </summary>
     [RelayCommand]
     private void ClearFilter()
     {
         SelectedTag = null;
     }
 
+    /// <summary>
+    /// Performs a semantic search using the vector service based on the current search query.
+    /// Refreshes the question list with the search results.
+    /// </summary>
     [RelayCommand]
     private async Task SearchAsync()
     {
@@ -132,8 +172,10 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            // TODO: Inject a proper logger service.
+            Debug.WriteLine($"Search failed: {ex}");
             Questions.Clear();
         }
     }
