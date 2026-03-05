@@ -25,8 +25,10 @@ public partial class LibraryView : UserControl
     private async void OnLoaded(object sender, System.Windows.RoutedEventArgs e)
     {
         await InitializeAsync();
+
         if (DataContext is LibraryViewModel vm)
         {
+            vm.Activate();
             _ = vm.LoadTagsAsync();
             _ = vm.LoadQuestionsAsync();
             vm.PropertyChanged += OnViewModelPropertyChanged;
@@ -37,6 +39,7 @@ public partial class LibraryView : UserControl
     {
         if (DataContext is LibraryViewModel vm)
         {
+            vm.Deactivate();
             vm.PropertyChanged -= OnViewModelPropertyChanged;
         }
     }

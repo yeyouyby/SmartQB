@@ -1,0 +1,41 @@
+# SmartQB Code Audit & Development Plan
+
+## 1. Audit Findings
+
+1. **WebView2 Environment Initialization (nextdo.md #1)**:
+   - **Status**: Implemented. Both `ExportView.xaml.cs` and `LibraryView.xaml.cs` use `WebView2Helper.GetEnvironmentAsync()` which configures a specific UserDataFolder (`AppData/Local/SmartQB/WebView2`).
+2. **UI Polishing (nextdo.md #2)**:
+   - **Status**: Pending. `MaterialDesignThemes` is included in the project dependencies, but `App.xaml`, `LibraryView.xaml`, and `ExportView.xaml` lack substantial styling. Left-panel LaTeX preview in `LibraryView` is partially implemented via `MathRenderingHelper` (WpfMath).
+3. **Advanced Filtering (nextdo.md #3)**:
+   - **Status**: Basic semantic search is implemented in `LibraryViewModel` calling `_vectorService.SearchSimilarAsync(SearchQuery, 10)`. Tag filtering is also implemented.
+4. **Unit Tests (nextdo.md #4)**:
+   - **Status**: Pending. `SmartQB.UI.Tests` project exists, but test coverage for ViewModels is missing.
+5. **Ingestion Polish (nextdo.md #5)**:
+   - **Status**: Addressed via standard C# events (`_taggingService.QuestionProcessed`) rather than an EventAggregator. The UI subscribes to this and calls `LoadQuestionsAsync` on the Dispatcher thread.
+6. **Memory Constraints Validation**:
+   - Correctly handled `panel.Children.Clear()` in `MathRenderingHelper.cs`.
+   - `UseWPF` and `EnableWindowsTargeting` are correctly set in `SmartQB.UI.Tests.csproj`.
+   - ListBox `DisplayMemberPath` vs `ItemTemplate` is correctly managed.
+   - LLM service null validation (`result?.Value?.Content`) is correctly implemented in `LLMService.cs`.
+   - C# 12 Primary Constructors were missing in `LibraryViewModel` and have been refactored.
+
+## 2. Next Phase Development Plan
+
+Based on the audit, here are the detailed next steps:
+
+### Task 1: UI Styling & Polish (MaterialDesignThemes)
+- Update `App.xaml` to merge `MaterialDesignThemes` dictionaries (Color, Theme, Defaults).
+- Update `MainLayout`, `LibraryView`, and `ExportView` to utilize Material Design controls (Cards, floating hint TextBoxes, styling for Buttons).
+- Ensure left-panel ListBox items in `LibraryView` have proper padding, margins, and hover effects using Material Design templates.
+
+### Task 2: Advanced Search / Filtering Enhancements
+- Enhance the UI in `LibraryView.xaml` to show "Searching..." state or a progress spinner when semantic search is executing.
+- Implement debounce logic in `LibraryViewModel` for `SearchQuery` to trigger auto-search after user stops typing (optional but good practice).
+
+### Task 3: Unit Testing ViewModels
+- Create test classes in `SmartQB.UI.Tests` for `LibraryViewModel`, `ExportViewModel`, and `MainViewModel`.
+- Mock `IQuestionService`, `IVectorService`, and `ITaggingService` using Moq.
+- Test initialization, command execution (`SearchAsync`, `ClearFilter`), and property change behaviors.
+
+### Task 4: Math Rendering Robustness
+- Review `MathRenderingHelper.cs`. Add better error handling or fallback visuals when `WpfMath` fails to render a complex equation.

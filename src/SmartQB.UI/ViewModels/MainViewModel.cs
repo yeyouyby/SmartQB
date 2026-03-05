@@ -4,6 +4,9 @@ using SmartQB.Core.Interfaces;
 
 namespace SmartQB.UI.ViewModels;
 
+/// <summary>
+/// Root ViewModel that handles global navigation and basic application states.
+/// </summary>
 public partial class MainViewModel(ImportViewModel importVM, LibraryViewModel libraryVM, ExportViewModel exportVM, IVersionService versionService) : ObservableObject
 {
     private readonly IVersionService _versionService = versionService;
@@ -18,6 +21,10 @@ public partial class MainViewModel(ImportViewModel importVM, LibraryViewModel li
     public LibraryViewModel LibraryVM { get; } = libraryVM;
     public ExportViewModel ExportVM { get; } = exportVM;
 
+    /// <summary>
+    /// Switches the active view model based on navigation requests from the sidebar.
+    /// </summary>
+    /// <param name="destination">The string literal of the destination view ("Import", "Library", "Export").</param>
     [RelayCommand]
     private void Navigate(string destination)
     {

@@ -7,6 +7,9 @@ using System;
 
 namespace SmartQB.UI.ViewModels;
 
+/// <summary>
+/// ViewModel for the Export view, handling the generation of HTML papers from the question bank.
+/// </summary>
 public partial class ExportViewModel(IQuestionService questionService) : ObservableObject
 {
     private readonly IQuestionService _questionService = questionService;
@@ -14,8 +17,12 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
     [ObservableProperty]
     private string _status = "Ready to export";
 
-    // A real implementation would allow users to select specific questions.
-    // For now, we will just export all questions in a simple HTML template.
+    /// <summary>
+    /// Generates the HTML representation of the question paper, optionally including logic descriptors as answers.
+    /// This output is intended to be rendered by WebView2 and exported as a PDF.
+    /// </summary>
+    /// <param name="includeAnswers">If true, includes the answers/logic paths in the generated HTML.</param>
+    /// <returns>A string containing the formatted HTML paper with MathJax enabled for LaTeX.</returns>
     public async Task<string> GenerateHtmlAsync(bool includeAnswers)
     {
         var questions = await _questionService.GetAllQuestionsAsync();
