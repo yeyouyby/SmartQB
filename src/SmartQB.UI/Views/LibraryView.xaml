@@ -18,15 +18,24 @@
         <Border Grid.Column="0" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,1,0" Margin="0,0,16,0" Padding="0,0,16,0">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="All Questions" Style="{StaticResource MaterialDesignHeadline5TextBlock}" Margin="0,0,0,16"/>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,16">
-                    <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Search questions..." Width="200" Margin="0,0,16,0" Style="{StaticResource MaterialDesignOutlinedTextBox}" />
-                    <Button Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource MaterialDesignFlatButton}" />
-                </StackPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,16">
-                    <TextBlock Text="Filter by Tag: " VerticalAlignment="Center" Margin="0,0,8,0" Style="{StaticResource MaterialDesignBody1TextBlock}" />
-                    <ComboBox ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}" materialDesign:HintAssist.Hint="Select a tag" Width="150" DisplayMemberPath="Name" Style="{StaticResource MaterialDesignOutlinedComboBox}" />
-                    <Button Content="Clear" Command="{Binding ClearFilterCommand}" Margin="16,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" />
-                </StackPanel>
+                <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Search questions..." Margin="0,0,16,0" Style="{StaticResource MaterialDesignOutlinedTextBox}" HorizontalAlignment="Stretch" />
+                    <Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource MaterialDesignFlatButton}" VerticalAlignment="Center" />
+                </Grid>
+                <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Filter by Tag: " VerticalAlignment="Center" Margin="0,0,8,0" Style="{StaticResource MaterialDesignBody1TextBlock}" />
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}" materialDesign:HintAssist.Hint="Select a tag" DisplayMemberPath="Name" Style="{StaticResource MaterialDesignOutlinedComboBox}" HorizontalAlignment="Stretch" />
+                    <Button Grid.Column="2" Content="Clear" Command="{Binding ClearFilterCommand}" Margin="16,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" VerticalAlignment="Center" />
+                </Grid>
                 <ListBox ItemsSource="{Binding Questions}" SelectedItem="{Binding SelectedQuestion}" Style="{StaticResource MaterialDesignChoiceChipPrimaryListBox}" HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
