@@ -18,7 +18,7 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
     // For now, we will just export all questions in a simple HTML template.
     public async Task<string> GenerateHtmlAsync(bool includeAnswers)
     {
-        var questions = await _questionService.GetAllQuestionsAsync();
+        var questions = await _questionService.GetQuestionsAsync();
 
         var sb = new StringBuilder();
         sb.AppendLine("<!DOCTYPE html>");
