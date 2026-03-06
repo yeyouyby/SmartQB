@@ -92,11 +92,7 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
     public async Task LoadTagsAsync()
     {
         var tags = await _questionService.GetAllTagsAsync();
-        Tags.Clear();
-        foreach (var t in tags)
-        {
-            Tags.Add(t);
-        }
+        Tags = new ObservableCollection<Tag>(tags);
     }
 
     /// <summary>
@@ -105,10 +101,11 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
     public async Task LoadQuestionsAsync()
     {
         var list = await _questionService.GetAllQuestionsAsync();
-        Questions.Clear();
-        foreach (var q in list)
+
+        if (SelectedTag != null)
         {
-            if (SelectedTag != null)
+            var filteredList = new System.Collections.Generic.List<Question>();
+            foreach (var q in list)
             {
                 bool hasTag = false;
                 foreach (var t in q.Tags)
@@ -119,9 +116,16 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
                         break;
                     }
                 }
-                if (!hasTag) continue;
+                if (hasTag)
+                {
+                    filteredList.Add(q);
+                }
             }
-            Questions.Add(q);
+            Questions = new ObservableCollection<Question>(filteredList);
+        }
+        else
+        {
+            Questions = new ObservableCollection<Question>(list);
         }
     }
 
@@ -150,12 +154,12 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
         try
         {
             var results = await _vectorService.SearchSimilarAsync(SearchQuery, 10);
-            Questions.Clear();
             if (results != null)
             {
-                foreach (var q in results)
+                if (SelectedTag != null)
                 {
-                    if (SelectedTag != null)
+                    var filteredList = new System.Collections.Generic.List<Question>();
+                    foreach (var q in results)
                     {
                         bool hasTag = false;
                         foreach (var t in q.Tags)
@@ -166,10 +170,21 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
                                 break;
                             }
                         }
-                        if (!hasTag) continue;
+                        if (hasTag)
+                        {
+                            filteredList.Add(q);
+                        }
                     }
-                    Questions.Add(q);
+                    Questions = new ObservableCollection<Question>(filteredList);
                 }
+                else
+                {
+                    Questions = new ObservableCollection<Question>(results);
+                }
+            }
+            else
+            {
+                Questions = new ObservableCollection<Question>();
             }
         }
         catch (Exception ex)

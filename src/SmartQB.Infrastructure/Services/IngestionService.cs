@@ -103,10 +103,14 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
                         }
 
                         // Async tagging logic
-                        _ = Task.Run(async () => {
-                            try {
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
                                 await _taggingService.TagQuestionAsync(question.Id);
-                            } catch (Exception ex) {
+                            }
+                            catch (Exception ex)
+                            {
                                 _logger.LogError(ex, "Failed to auto-tag question {QuestionId}", question.Id);
                             }
                         });
