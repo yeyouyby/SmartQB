@@ -20,11 +20,11 @@
             <CheckBox x:Name="IncludeAnswersCheck" Content="Include Answers (Teacher Edition)" Style="{StaticResource MaterialDesignCheckBox}" VerticalAlignment="Center" Margin="0,0,24,0" IsChecked="True"/>
             <Button Content="Preview HTML" Click="Preview_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,16,0"/>
             <Button Content="Export to PDF" Click="Export_Click" Style="{StaticResource MaterialDesignRaisedButton}"/>
-            <TextBlock Text="{Binding Status}" Style="{StaticResource MaterialDesignBody2TextBlock}" VerticalAlignment="Center" Margin="24,0,0,0" Foreground="Gray"/>
+            <TextBlock Text="{Binding Status}" Style="{StaticResource MaterialDesignBody2TextBlock}" VerticalAlignment="Center" Margin="24,0,0,0" Foreground="{DynamicResource MaterialDesign.Brush.Foreground.Hint}"/>
         </StackPanel>
 
         <!-- Hidden WebView for generating PDF, or shown for preview -->
-        <Border Grid.Row="1" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="16">
+        <Border Grid.Row="1" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="1" CornerRadius="8" Padding="16">
             <wv2:WebView2 x:Name="WebView" />
         </Border>
     </Grid>

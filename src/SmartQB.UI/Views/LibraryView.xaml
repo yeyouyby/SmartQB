@@ -15,12 +15,12 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0" Margin="0,0,16,0" Padding="0,0,16,0">
+        <Border Grid.Column="0" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,1,0" Margin="0,0,16,0" Padding="0,0,16,0">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="All Questions" Style="{StaticResource MaterialDesignHeadline5TextBlock}" Margin="0,0,0,16"/>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,16">
                     <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Search questions..." Width="200" Margin="0,0,16,0" Style="{StaticResource MaterialDesignOutlinedTextBox}" />
-                    <Button Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource MaterialDesignFlatDarkBgButton}" />
+                    <Button Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource MaterialDesignFlatButton}" />
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,16">
                     <TextBlock Text="Filter by Tag: " VerticalAlignment="Center" Margin="0,0,8,0" Style="{StaticResource MaterialDesignBody1TextBlock}" />
@@ -30,7 +30,7 @@
                 <ListBox ItemsSource="{Binding Questions}" SelectedItem="{Binding SelectedQuestion}" Style="{StaticResource MaterialDesignChoiceChipPrimaryListBox}" HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,4">
+                            <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,4">
                                 <WrapPanel helpers:MathRenderingHelper.MathText="{Binding Content}" />
                             </Border>
                         </DataTemplate>
@@ -39,7 +39,7 @@
             </DockPanel>
         </Border>
 
-        <Border Grid.Column="1" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
+        <Border Grid.Column="1" Padding="16" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="1" CornerRadius="8">
             <wv2:WebView2 xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" x:Name="DetailsWebView" />
         </Border>
     </Grid>
