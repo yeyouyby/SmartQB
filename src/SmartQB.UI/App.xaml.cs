@@ -24,6 +24,11 @@ public partial class App : Application
             {
                 config.SetBasePath(AppContext.BaseDirectory);
                 config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+                if (context.HostingEnvironment.IsDevelopment())
+                {
+                    config.AddUserSecrets<App>();
+                }
             })
             .ConfigureServices((context, services) =>
             {
@@ -49,7 +54,8 @@ public partial class App : Application
                 services.AddSingleton<ILLMService>(sp =>
                 {
                     var config = sp.GetRequiredService<IConfiguration>();
-                    var apiKey = config["AI:ApiKey"] ?? throw new InvalidOperationException("AI:ApiKey is missing");
+                    var apiKey = config["AI:ApiKey"];
+                    if (string.IsNullOrWhiteSpace(apiKey)) throw new InvalidOperationException("AI:ApiKey is missing or empty.");
                     var modelId = config["AI:ModelId"] ?? "gpt-4o";
                     return new LLMService(apiKey, modelId);
                 });
