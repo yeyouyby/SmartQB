@@ -15,9 +15,9 @@ public class LLMService : ILLMService
 
     public LLMService(string apiKey, string modelId = "gpt-4o", string embeddingModelId = "text-embedding-3-small")
     {
-         var credential = new ApiKeyCredential(apiKey);
-         _chatClient = new ChatClient(modelId, credential);
-         _embeddingClient = new EmbeddingClient(embeddingModelId, credential);
+        var credential = new ApiKeyCredential(apiKey);
+        _chatClient = new ChatClient(modelId, credential);
+        _embeddingClient = new EmbeddingClient(embeddingModelId, credential);
     }
 
     public async Task<string> ChatAsync(string prompt, string? systemPrompt = null)
@@ -33,7 +33,7 @@ public class LLMService : ILLMService
 
         if (result?.Value?.Content == null || result.Value.Content.Count == 0)
         {
-             throw new InvalidOperationException("Received empty or invalid response from LLM.");
+            throw new InvalidOperationException("Received empty or invalid response from LLM.");
         }
 
         return result.Value.Content[0].Text ?? string.Empty;
@@ -53,7 +53,7 @@ public class LLMService : ILLMService
 
         if (result?.Value?.Content == null || result.Value.Content.Count == 0)
         {
-             throw new InvalidOperationException("Received empty or invalid response from LLM.");
+            throw new InvalidOperationException("Received empty or invalid response from LLM.");
         }
 
         return result.Value.Content[0].Text ?? string.Empty;

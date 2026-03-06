@@ -122,7 +122,7 @@ Reply with strictly YES or NO.";
         return response?.Trim().ToUpper().StartsWith("YES") == true;
     }
 
-        public async Task TagQuestionAsync(int questionId)
+    public async Task TagQuestionAsync(int questionId)
     {
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
