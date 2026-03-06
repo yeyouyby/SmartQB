@@ -106,7 +106,8 @@ public partial class ExportView : UserControl
             }
             catch (Exception ex)
             {
-                vm.Status = $"Error: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"Error exporting PDF: {ex}");
+                vm.Status = "An error occurred during PDF export.";
             }
         }
     }
