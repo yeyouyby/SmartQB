@@ -7,7 +7,7 @@ public static class ImageSegmentationLogic
 {
     // Fix: cannot use ReadOnlySpan in an iterator method (yield return)
     // We can change the return type to List and return at the end
-    public static IEnumerable<(int StartY, int EndY)> FindVerticalSegments(
+    public static List<(int StartY, int EndY)> FindVerticalSegments(
         ReadOnlySpan<int> rowDensities,
         int noiseThreshold = 5,
         int minGapHeight = 30,

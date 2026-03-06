@@ -70,7 +70,7 @@ public class PdfService(IOptions<PdfExtractionOptions> options) : IPdfService
         }
 
         // 3. Call the pure logic algorithm
-        var segments = ImageSegmentationLogic.FindVerticalSegments(rowInkDensity, _options.NoiseThreshold, _options.GapThreshold, _options.MinQuestionHeight).ToList();
+        var segments = ImageSegmentationLogic.FindVerticalSegments(rowInkDensity, _options.NoiseThreshold, _options.GapThreshold, _options.MinQuestionHeight);
 
         // 4. Crop and Save Images
         foreach (var segment in segments)

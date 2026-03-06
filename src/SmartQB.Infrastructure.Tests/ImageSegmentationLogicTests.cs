@@ -15,7 +15,7 @@ public class ImageSegmentationLogicTests
         for (int i = 100; i < 150; i++) densities[i] = 10;
         for (int i = 200; i < 250; i++) densities[i] = 10;
 
-        var results = ImageSegmentationLogic.FindVerticalSegments(densities, noiseThreshold: 5, minGapHeight: 30, minSegmentHeight: 50).ToList();
+        var results = ImageSegmentationLogic.FindVerticalSegments(densities, noiseThreshold: 5, minGapHeight: 30, minSegmentHeight: 50);
 
         Assert.Equal(3, results.Count);
 
@@ -36,7 +36,7 @@ public class ImageSegmentationLogicTests
 
         // This will return [0, 300] because we didn't add logic to filter out completely empty segments.
         // User said: "验证是否返回空集合或原图" -> single original image segment is fine.
-        var results = ImageSegmentationLogic.FindVerticalSegments(densities, noiseThreshold: 5, minGapHeight: 30, minSegmentHeight: 50).ToList();
+        var results = ImageSegmentationLogic.FindVerticalSegments(densities, noiseThreshold: 5, minGapHeight: 30, minSegmentHeight: 50);
 
         Assert.Single(results);
         Assert.Equal(0, results[0].StartY);
@@ -51,7 +51,7 @@ public class ImageSegmentationLogicTests
         for (int i = 0; i < 50; i++) densities[i] = 10;
         for (int i = 70; i < 120; i++) densities[i] = 10;
 
-        var results = ImageSegmentationLogic.FindVerticalSegments(densities, noiseThreshold: 5, minGapHeight: 30, minSegmentHeight: 50).ToList();
+        var results = ImageSegmentationLogic.FindVerticalSegments(densities, noiseThreshold: 5, minGapHeight: 30, minSegmentHeight: 50);
 
         Assert.Single(results);
         Assert.Equal(0, results[0].StartY);
