@@ -1,14 +1,16 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using SmartQB.Core.Interfaces;
 using System;
 using System.Threading.Tasks;
 
 namespace SmartQB.UI.ViewModels;
 
-public partial class ImportViewModel(IIngestionService ingestionService) : ObservableObject
+public partial class ImportViewModel(IIngestionService ingestionService, ILogger<ImportViewModel> logger) : ObservableObject
 {
     private readonly IIngestionService _ingestionService = ingestionService;
+    private readonly ILogger<ImportViewModel> _logger = logger;
 
     [ObservableProperty]
     private string _statusMessage = "Ready to import";
@@ -32,7 +34,8 @@ public partial class ImportViewModel(IIngestionService ingestionService) : Obser
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
+            _logger.LogError(ex, "Error processing PDF file: {FilePath}", filePath);
+            StatusMessage = "An error occurred during import. Please check logs for details.";
         }
         finally
         {
