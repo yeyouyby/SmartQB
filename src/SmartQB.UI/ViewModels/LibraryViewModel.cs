@@ -49,12 +49,21 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
     {
         if (System.Windows.Application.Current != null)
         {
-            System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
+            System.Windows.Application.Current.Dispatcher.BeginInvoke(async () =>
             {
-                _ = LoadQuestionsAsync();
+                await LoadQuestionsAsync();
+                StatusMessage = "New questions processed. List updated.";
+                await Task.Delay(3000);
+                if (StatusMessage == "New questions processed. List updated.")
+                {
+                    StatusMessage = string.Empty;
+                }
             });
         }
     }
+
+    [ObservableProperty]
+    private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     private ObservableCollection<Question> _questions = new();

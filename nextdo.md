@@ -2,25 +2,23 @@
 
 Hi Next AI Agent,
 
-I have completed the core implementation of the WPF UI layout and the infrastructure logic. Here's what has been done:
-1. Updated `README.md` to reflect the completed `Recursive Tagging Service` and `UI` phases.
-2. Code Audit: Replaced manual dependency injection fields with C# 12 Primary Constructors across ViewModels and Services. Implemented missing `TagQuestionAsync` logic in `TaggingService`.
-3. Added the `MainLayout` with a Sidebar and a Content Area that supports ViewModel switching.
-4. Implemented `LibraryView` displaying a list of extracted questions (along with tags/logic properties) on the left and full details on the right.
-5. Implemented `ExportView` which uses an HTML template injected into `Microsoft.Web.WebView2` (rendering LaTeX via MathJax) and exporting it as a PDF using `PrintToPdfAsync`.
+I have completed the previous pending tasks, which included polishing the UI and adding notification mechanisms for background tagging logic.
+
+Here is what was achieved:
+1. Ensured `WebView2` environment initialization correctly configures the `UserDataFolder` via `WebView2Helper`.
+2. UI Polishing: Added `MaterialDesignThemes` to `App.xaml` to improve control styling. `MathRenderingHelper` is correctly set up for the left panel preview of LaTeX formulas.
+3. Added status notification (`StatusMessage`) to `LibraryViewModel` that automatically appears when new questions are successfully tagged in the background, updating the view accordingly.
+4. Explored and verified existing unit tests (`LibraryViewModelTests`, `ExportViewModelTests`, `MainViewModelTests`) covering the main business logic and core services.
 
 ## Pending Tasks (Your To-Do List):
 
-1. **WebView2 Environment Initialization Enhancements**:
-   - `ExportView.xaml.cs` currently has a simple `EnsureCoreWebView2Async(null)` call. It should properly configure the UserDataFolder to a temporary or application-specific path (e.g., `AppData/Local/SmartQB/WebView2`) to avoid permissions issues when the app is installed globally.
-2. **UI Polishing**:
-   - Improve the design and styles using WPF control templates or a library like `WPF UI` or `MaterialDesignThemes`.
-   - The `LibraryView` list items currently display unrendered LaTeX. It would be awesome if the left-panel previews also render math formulas nicely (either via WebView2 blocks or a dedicated WPF Math rendering library).
-3. **Advanced Filtering**:
-   - `LibraryView` needs search and filtering functionalities based on Tags and Vector Embeddings (Semantic Search). Implement UI components and connect them to the `VectorService` search methods.
-4. **Unit Tests**:
-   - Write tests for `MainViewModel`, `LibraryViewModel`, and `ExportViewModel`.
-5. **Ingestion Polish**:
-   - The `IngestionService` uses `TagQuestionAsync` asynchronously. Add UI notification handling via an EventAggregator or Messenger (`CommunityToolkit.Mvvm.Messaging`) to notify the `LibraryView` when new questions have been completely tagged and processed.
+1. **Tag Management View**:
+   - Currently, users can filter by tags in `LibraryView`, but cannot visually manage (create, rename, delete) them. Create a `TagsViewModel` and `TagsView` to allow the user to view and manage all tags independently.
+2. **AI-Assisted Tagging UI**:
+   - Implement a manual trigger in the `LibraryView` (e.g., a "Suggest Tags" button for the selected question) to call `ITaggingService` on demand, and display the result in a user-friendly manner.
+3. **Application Packaging & Installer**:
+   - Configure a setup project (like `WiX Toolset` or `Inno Setup`, or just `.NET ClickOnce`/MSIX) for easy distribution of the local WPF application.
+4. **Error Handling & Logging**:
+   - Introduce a proper logging framework (like `Serilog` or `NLog`) and ensure that all application errors (especially from `WebView2` or `LLMService`) are logged effectively.
 
 Good luck!
