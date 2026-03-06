@@ -9,18 +9,27 @@ I have completed the core implementation of the WPF UI layout and the infrastruc
 4. Implemented `LibraryView` displaying a list of extracted questions (along with tags/logic properties) on the left and full details on the right.
 5. Implemented `ExportView` which uses an HTML template injected into `Microsoft.Web.WebView2` (rendering LaTeX via MathJax) and exporting it as a PDF using `PrintToPdfAsync`.
 
-## Pending Tasks (Your To-Do List):
+## Completed Tasks
 
 1. **WebView2 Environment Initialization Enhancements**:
-   - `ExportView.xaml.cs` currently has a simple `EnsureCoreWebView2Async(null)` call. It should properly configure the UserDataFolder to a temporary or application-specific path (e.g., `AppData/Local/SmartQB/WebView2`) to avoid permissions issues when the app is installed globally.
+   - Done. Uses `WebView2Helper.GetEnvironmentAsync()` in `ExportView.xaml.cs` and `LibraryView.xaml.cs` to properly configure `UserDataFolder`.
 2. **UI Polishing**:
-   - Improve the design and styles using WPF control templates or a library like `WPF UI` or `MaterialDesignThemes`.
-   - The `LibraryView` list items currently display unrendered LaTeX. It would be awesome if the left-panel previews also render math formulas nicely (either via WebView2 blocks or a dedicated WPF Math rendering library).
+   - Done. Integrated `MaterialDesignThemes` in `LibraryView.xaml` and `ExportView.xaml`.
+   - Math rendering is working in the left-panel list items via `MathRenderingHelper` using `WpfMath`.
 3. **Advanced Filtering**:
-   - `LibraryView` needs search and filtering functionalities based on Tags and Vector Embeddings (Semantic Search). Implement UI components and connect them to the `VectorService` search methods.
+   - Done. `LibraryViewModel` effectively provides search and tag-based filtering functionality connected to `VectorService` methods.
 4. **Unit Tests**:
-   - Write tests for `MainViewModel`, `LibraryViewModel`, and `ExportViewModel`.
+   - Done. Addressed for `MainViewModel`, `LibraryViewModel`, and `ExportViewModel`.
 5. **Ingestion Polish**:
-   - The `IngestionService` uses `TagQuestionAsync` asynchronously. Add UI notification handling via an EventAggregator or Messenger (`CommunityToolkit.Mvvm.Messaging`) to notify the `LibraryView` when new questions have been completely tagged and processed.
+   - Done. Proper event handlers are set up to capture tagging service completions (`QuestionProcessed` event) directly reloading question lists in the UI thread.
+
+## Next Tasks (Your To-Do List):
+
+1. **Bug Fixing & Testing Edge Cases**:
+   - Verify robust error handling.
+   - Run End-to-End (E2E) testing with an actual UI runner and fix potential memory leaks on Navigation.
+2. **Setup Packaging and CI/CD**:
+   - Setup an MSIX or an installer project for standard deployment.
+   - Implement GitHub Actions CI for building the .NET 10 project and verifying cross-platform test coverage.
 
 Good luck!
