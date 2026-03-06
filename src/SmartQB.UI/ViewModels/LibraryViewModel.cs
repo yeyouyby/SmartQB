@@ -104,23 +104,10 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
     /// </summary>
     public async Task LoadQuestionsAsync()
     {
-        var list = await _questionService.GetAllQuestionsAsync();
+        var list = await _questionService.GetQuestionsAsync(SelectedTag?.Id);
         Questions.Clear();
         foreach (var q in list)
         {
-            if (SelectedTag != null)
-            {
-                bool hasTag = false;
-                foreach (var t in q.Tags)
-                {
-                    if (t.Id == SelectedTag.Id)
-                    {
-                        hasTag = true;
-                        break;
-                    }
-                }
-                if (!hasTag) continue;
-            }
             Questions.Add(q);
         }
     }
@@ -149,25 +136,12 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
 
         try
         {
-            var results = await _vectorService.SearchSimilarAsync(SearchQuery, 10);
+            var results = await _vectorService.SearchSimilarAsync(SearchQuery, 10, SelectedTag?.Id);
             Questions.Clear();
             if (results != null)
             {
                 foreach (var q in results)
                 {
-                    if (SelectedTag != null)
-                    {
-                        bool hasTag = false;
-                        foreach (var t in q.Tags)
-                        {
-                            if (t.Id == SelectedTag.Id)
-                            {
-                                hasTag = true;
-                                break;
-                            }
-                        }
-                        if (!hasTag) continue;
-                    }
                     Questions.Add(q);
                 }
             }

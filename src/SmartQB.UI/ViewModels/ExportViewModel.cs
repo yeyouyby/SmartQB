@@ -25,7 +25,7 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
     /// <returns>A string containing the formatted HTML paper with MathJax enabled for LaTeX.</returns>
     public async Task<string> GenerateHtmlAsync(bool includeAnswers)
     {
-        var questions = await _questionService.GetAllQuestionsAsync();
+        var questions = await _questionService.GetQuestionsAsync();
 
         var sb = new StringBuilder();
         sb.AppendLine("<!DOCTYPE html>");

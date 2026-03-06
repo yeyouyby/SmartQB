@@ -6,6 +6,6 @@ namespace SmartQB.Core.Interfaces;
 
 public interface IQuestionService
 {
-    Task<List<Question>> GetAllQuestionsAsync();
+    Task<List<Question>> GetQuestionsAsync(int? tagId = null);
     Task<List<Tag>> GetAllTagsAsync();
 }
