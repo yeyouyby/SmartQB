@@ -20,7 +20,7 @@ public class LibraryViewModelTests
             new Question { Id = 1, Content = "Q1" },
             new Question { Id = 2, Content = "Q2" }
         };
-        questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync()).ReturnsAsync(mockQuestions);
+        questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync(null)).ReturnsAsync(mockQuestions);
 
         var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
 
@@ -45,7 +45,7 @@ public class LibraryViewModelTests
         {
             new Question { Id = 3, Content = "Search Result Q3" }
         };
-        vectorServiceMock.Setup(vs => vs.SearchSimilarAsync("test query", 10)).ReturnsAsync(searchResults);
+        vectorServiceMock.Setup(vs => vs.SearchSimilarAsync("test query", 10, null)).ReturnsAsync(searchResults);
 
         var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
         vm.SearchQuery = "test query";
@@ -54,7 +54,7 @@ public class LibraryViewModelTests
         await vm.SearchCommand.ExecuteAsync(null);
 
         // Assert
-        vectorServiceMock.Verify(vs => vs.SearchSimilarAsync("test query", 10), Times.Once);
+        vectorServiceMock.Verify(vs => vs.SearchSimilarAsync("test query", 10, null), Times.Once);
         Assert.Single(vm.Questions);
         Assert.Equal("Search Result Q3", vm.Questions[0].Content);
     }
@@ -71,7 +71,7 @@ public class LibraryViewModelTests
         {
             new Question { Id = 1, Content = "Q1" }
         };
-        questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync()).ReturnsAsync(mockQuestions);
+        questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync(null)).ReturnsAsync(mockQuestions);
 
         var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
         vm.SearchQuery = "";
@@ -80,7 +80,7 @@ public class LibraryViewModelTests
         await vm.SearchCommand.ExecuteAsync(null);
 
         // Assert
-        questionServiceMock.Verify(qs => qs.GetAllQuestionsAsync(), Times.Once);
+        questionServiceMock.Verify(qs => qs.GetAllQuestionsAsync(null), Times.Once);
         Assert.Single(vm.Questions);
     }
 
@@ -93,15 +93,12 @@ public class LibraryViewModelTests
         var taggingServiceMock = new Mock<ITaggingService>();
 
         var tag1 = new Tag { Id = 1, Name = "Math" };
-        var tag2 = new Tag { Id = 2, Name = "Physics" };
 
         var mockQuestions = new List<Question>
         {
-            new Question { Id = 1, Content = "Q1", Tags = new List<Tag> { tag1 } },
-            new Question { Id = 2, Content = "Q2", Tags = new List<Tag> { tag2 } },
-            new Question { Id = 3, Content = "Q3", Tags = new List<Tag> { tag1, tag2 } }
+            new Question { Id = 1, Content = "Q1", Tags = new List<Tag> { tag1 } }
         };
-        questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync()).ReturnsAsync(mockQuestions);
+        questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync(1)).ReturnsAsync(mockQuestions);
 
         var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
 
@@ -109,10 +106,8 @@ public class LibraryViewModelTests
         vm.SelectedTag = tag1;
 
         // Assert
-        Assert.Equal(2, vm.Questions.Count);
-        Assert.Contains(vm.Questions, q => q.Id == 1);
-        Assert.Contains(vm.Questions, q => q.Id == 3);
-        Assert.DoesNotContain(vm.Questions, q => q.Id == 2);
+        questionServiceMock.Verify(qs => qs.GetAllQuestionsAsync(1), Times.Once);
+        Assert.Single(vm.Questions);
     }
 
     [Fact]
@@ -127,10 +122,9 @@ public class LibraryViewModelTests
 
         var searchResults = new List<Question>
         {
-            new Question { Id = 1, Content = "Result 1", Tags = new List<Tag> { tag1 } },
-            new Question { Id = 2, Content = "Result 2" }
+            new Question { Id = 1, Content = "Result 1", Tags = new List<Tag> { tag1 } }
         };
-        vectorServiceMock.Setup(vs => vs.SearchSimilarAsync("test query", 10)).ReturnsAsync(searchResults);
+        vectorServiceMock.Setup(vs => vs.SearchSimilarAsync("test query", 10, 1)).ReturnsAsync(searchResults);
 
         var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
         vm.SearchQuery = "test query";
@@ -140,7 +134,7 @@ public class LibraryViewModelTests
         await vm.SearchCommand.ExecuteAsync(null);
 
         // Assert
-        vectorServiceMock.Verify(vs => vs.SearchSimilarAsync("test query", 10), Times.Once);
+        vectorServiceMock.Verify(vs => vs.SearchSimilarAsync("test query", 10, 1), Times.Once);
         Assert.Single(vm.Questions);
         Assert.Equal("Result 1", vm.Questions[0].Content);
     }
