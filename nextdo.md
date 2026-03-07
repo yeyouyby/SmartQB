@@ -9,18 +9,26 @@ I have completed the core implementation of the WPF UI layout and the infrastruc
 4. Implemented `LibraryView` displaying a list of extracted questions (along with tags/logic properties) on the left and full details on the right.
 5. Implemented `ExportView` which uses an HTML template injected into `Microsoft.Web.WebView2` (rendering LaTeX via MathJax) and exporting it as a PDF using `PrintToPdfAsync`.
 
-## Pending Tasks (Your To-Do List):
+## Completed Tasks
 
 1. **WebView2 Environment Initialization Enhancements**:
-   - `ExportView.xaml.cs` currently has a simple `EnsureCoreWebView2Async(null)` call. It should properly configure the UserDataFolder to a temporary or application-specific path (e.g., `AppData/Local/SmartQB/WebView2`) to avoid permissions issues when the app is installed globally.
+   - Verified that `ExportView.xaml.cs` and `LibraryView.xaml.cs` correctly configure the `UserDataFolder` via `WebView2Helper`.
 2. **UI Polishing**:
-   - Improve the design and styles using WPF control templates or a library like `WPF UI` or `MaterialDesignThemes`.
-   - The `LibraryView` list items currently display unrendered LaTeX. It would be awesome if the left-panel previews also render math formulas nicely (either via WebView2 blocks or a dedicated WPF Math rendering library).
+   - Integrated `MaterialDesignThemes` in `App.xaml` for global styling.
+   - `LibraryView` uses `MathRenderingHelper` with `WpfMath` to natively render LaTeX in the WPF list.
 3. **Advanced Filtering**:
-   - `LibraryView` needs search and filtering functionalities based on Tags and Vector Embeddings (Semantic Search). Implement UI components and connect them to the `VectorService` search methods.
+   - Implemented database-level tag filtering in `IQuestionService` and `IVectorService`.
+   - Updated `LibraryViewModel` to pass the tag ID directly, avoiding memory-intensive client-side filtering.
 4. **Unit Tests**:
-   - Write tests for `MainViewModel`, `LibraryViewModel`, and `ExportViewModel`.
+   - ViewModels tests implemented in `SmartQB.UI.Tests` project and passed for `MainViewModel`, `LibraryViewModel`, and `ExportViewModel`.
 5. **Ingestion Polish**:
-   - The `IngestionService` uses `TagQuestionAsync` asynchronously. Add UI notification handling via an EventAggregator or Messenger (`CommunityToolkit.Mvvm.Messaging`) to notify the `LibraryView` when new questions have been completely tagged and processed.
+   - Verified that `LibraryViewModel` subscribes to the `QuestionProcessed` cross-layer event from `ITaggingService` to handle asynchronous tagging notifications.
 
-Good luck!
+## Next Tasks for the Next AI Agent
+
+1. **App Configuration**:
+   - Wire up real LLM configurations securely using user-secrets or environment variables.
+2. **Additional Tests**:
+   - Add integration tests for the `Infrastructure` project, focusing on `SQLite` usage.
+3. **Vector DB Integration**:
+   - Optionally swap out the local SQLite embedding search for ChromaDB if performance degrades with larger sets.

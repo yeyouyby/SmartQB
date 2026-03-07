@@ -16,7 +16,7 @@ public class ExportViewModelTests
         {
             new Question { Id = 1, Content = "Solve $x^2 = 4$", Difficulty = 2.5, LogicDescriptor = "$x = \\pm 2$" }
         };
-        questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync()).ReturnsAsync(mockQuestions);
+        questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync(null)).ReturnsAsync(mockQuestions);
 
         var vm = new ExportViewModel(questionServiceMock.Object);
 

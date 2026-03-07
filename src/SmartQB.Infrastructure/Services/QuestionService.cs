@@ -12,12 +12,19 @@ public class QuestionService(IServiceScopeFactory scopeFactory) : IQuestionServi
 {
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 
-    public async Task<List<Question>> GetAllQuestionsAsync()
+    public async Task<List<Question>> GetAllQuestionsAsync(int? tagId = null)
     {
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
 
-        return await dbContext.Questions.Include(q => q.Tags).AsNoTracking().ToListAsync();
+        var query = dbContext.Questions.Include(q => q.Tags).AsNoTracking();
+
+        if (tagId.HasValue)
+        {
+            query = query.Where(q => q.Tags.Any(t => t.Id == tagId.Value));
+        }
+
+        return await query.ToListAsync();
     }
 
     public async Task<List<Tag>> GetAllTagsAsync()

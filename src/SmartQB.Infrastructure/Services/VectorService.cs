@@ -27,7 +27,7 @@ public class VectorService(ILLMService llmService, IServiceScopeFactory scopeFac
         return Task.CompletedTask;
     }
 
-    public async Task<List<Question>> SearchSimilarAsync(string query, int limit = 10)
+    public async Task<List<Question>> SearchSimilarAsync(string query, int limit = 10, int? tagId = null)
     {
         var queryVector = await _llmService.GetEmbeddingAsync(query);
         if (queryVector.Length == 0) return new List<Question>();
@@ -36,11 +36,15 @@ public class VectorService(ILLMService llmService, IServiceScopeFactory scopeFac
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
 
+            var q = dbContext.Questions.Include(x => x.Tags).AsNoTracking().Where(x => x.EmbeddingJson != null);
+
+            if (tagId.HasValue)
+            {
+                q = q.Where(x => x.Tags.Any(t => t.Id == tagId.Value));
+            }
+
             // Limit candidates to 1000 to avoid loading too much into memory
-            var questions = await dbContext.Questions.AsNoTracking()
-                .Where(q => q.EmbeddingJson != null)
-                .Take(1000)
-                .ToListAsync();
+            var questions = await q.Take(1000).ToListAsync();
 
             if (!questions.Any()) return new List<Question>();
 

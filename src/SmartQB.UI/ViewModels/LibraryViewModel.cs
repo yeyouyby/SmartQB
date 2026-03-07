@@ -104,25 +104,8 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
     /// </summary>
     public async Task LoadQuestionsAsync()
     {
-        var list = await _questionService.GetAllQuestionsAsync();
-        Questions.Clear();
-        foreach (var q in list)
-        {
-            if (SelectedTag != null)
-            {
-                bool hasTag = false;
-                foreach (var t in q.Tags)
-                {
-                    if (t.Id == SelectedTag.Id)
-                    {
-                        hasTag = true;
-                        break;
-                    }
-                }
-                if (!hasTag) continue;
-            }
-            Questions.Add(q);
-        }
+        var list = await _questionService.GetAllQuestionsAsync(SelectedTag?.Id);
+        Questions = new ObservableCollection<Question>(list);
     }
 
     /// <summary>
@@ -149,34 +132,21 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
 
         try
         {
-            var results = await _vectorService.SearchSimilarAsync(SearchQuery, 10);
-            Questions.Clear();
+            var results = await _vectorService.SearchSimilarAsync(SearchQuery, 10, SelectedTag?.Id);
             if (results != null)
             {
-                foreach (var q in results)
-                {
-                    if (SelectedTag != null)
-                    {
-                        bool hasTag = false;
-                        foreach (var t in q.Tags)
-                        {
-                            if (t.Id == SelectedTag.Id)
-                            {
-                                hasTag = true;
-                                break;
-                            }
-                        }
-                        if (!hasTag) continue;
-                    }
-                    Questions.Add(q);
-                }
+                Questions = new ObservableCollection<Question>(results);
+            }
+            else
+            {
+                Questions = new ObservableCollection<Question>();
             }
         }
         catch (Exception ex)
         {
             // TODO: Inject a proper logger service.
             Debug.WriteLine($"Search failed: {ex}");
-            Questions.Clear();
+            Questions = new ObservableCollection<Question>();
         }
     }
 }
