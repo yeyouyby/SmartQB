@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using Microsoft.Web.WebView2.Core;
 using SmartQB.UI.ViewModels;
 using SmartQB.UI.Helpers;
+using Microsoft.Extensions.Logging;
 
 namespace SmartQB.UI.Views;
 
@@ -13,16 +14,41 @@ public partial class ExportView : UserControl
 {
     private bool _isWebViewInitialized;
     private TaskCompletionSource<bool>? _navigationTcs;
+    private EventHandler<CoreWebView2NavigationCompletedEventArgs>? _navigationHandler;
 
     public ExportView()
     {
         InitializeComponent();
         Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
+
+        _navigationHandler = (sender, args) =>
+        {
+            if (_navigationTcs != null && !_navigationTcs.Task.IsCompleted)
+            {
+                _navigationTcs.SetResult(args.IsSuccess);
+            }
+        };
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await InitializeAsync();
+
+        // Always re-subscribe when loaded, ensuring we don't double subscribe
+        if (_isWebViewInitialized)
+        {
+            WebView.NavigationCompleted -= _navigationHandler;
+            WebView.NavigationCompleted += _navigationHandler;
+        }
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        if (_isWebViewInitialized && _navigationHandler != null)
+        {
+            WebView.NavigationCompleted -= _navigationHandler;
+        }
     }
 
     private async Task InitializeAsync()
@@ -35,17 +61,11 @@ public partial class ExportView : UserControl
             await WebView.EnsureCoreWebView2Async(env);
             _isWebViewInitialized = true;
 
-            WebView.NavigationCompleted += (sender, args) =>
-            {
-                if (_navigationTcs != null && !_navigationTcs.Task.IsCompleted)
-                {
-                    _navigationTcs.SetResult(args.IsSuccess);
-                }
-            };
+            WebView.NavigationCompleted += _navigationHandler;
         }
-        catch
+        catch (Exception ex)
         {
-            // Initialization failed
+            System.Diagnostics.Debug.WriteLine($"WebView2 init failed: {ex}");
         }
     }
 
@@ -55,9 +75,17 @@ public partial class ExportView : UserControl
         if (DataContext is ExportViewModel vm)
         {
             vm.Status = "Generating Preview...";
-            string html = await vm.GenerateHtmlAsync(IncludeAnswersCheck.IsChecked == true);
-            WebView.NavigateToString(html);
-            vm.Status = "Preview Ready";
+            try
+            {
+                string html = await vm.GenerateHtmlAsync(IncludeAnswersCheck.IsChecked == true);
+                WebView.NavigateToString(html);
+                vm.Status = "Preview Ready";
+            }
+            catch (Exception ex)
+            {
+                vm.Status = "Error generating preview.";
+                System.Diagnostics.Debug.WriteLine($"Preview error: {ex}");
+            }
         }
     }
 
@@ -68,27 +96,26 @@ public partial class ExportView : UserControl
         if (DataContext is ExportViewModel vm)
         {
             vm.Status = "Generating HTML...";
-            string html = await vm.GenerateHtmlAsync(IncludeAnswersCheck.IsChecked == true);
-
-            _navigationTcs = new TaskCompletionSource<bool>();
-            WebView.NavigateToString(html);
-
-            vm.Status = "Waiting for render...";
-            bool navigationSuccess = await _navigationTcs.Task;
-
-            // Give MathJax a tiny bit of time to render the equations after navigation finishes
-            await Task.Delay(500);
-
-            vm.Status = "Printing to PDF...";
-
-            string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string desktopPath = Path.Combine(downloadsPath, "Desktop");
-            if (!Directory.Exists(desktopPath)) desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
-            string filePath = Path.Combine(desktopPath, $"SmartQB_Paper_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
-
             try
             {
+                string html = await vm.GenerateHtmlAsync(IncludeAnswersCheck.IsChecked == true);
+
+                _navigationTcs = new TaskCompletionSource<bool>();
+                WebView.NavigateToString(html);
+
+                vm.Status = "Waiting for render...";
+                bool navigationSuccess = await _navigationTcs.Task;
+
+                await Task.Delay(500);
+
+                vm.Status = "Printing to PDF...";
+
+                string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string desktopPath = Path.Combine(downloadsPath, "Desktop");
+                if (!Directory.Exists(desktopPath)) desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+                string filePath = Path.Combine(desktopPath, $"SmartQB_Paper_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+
                 var printSettings = WebView.CoreWebView2.Environment.CreatePrintSettings();
                 printSettings.ShouldPrintBackgrounds = true;
                 printSettings.ShouldPrintSelectionOnly = false;
@@ -106,7 +133,8 @@ public partial class ExportView : UserControl
             }
             catch (Exception ex)
             {
-                vm.Status = $"Error: {ex.Message}";
+                vm.Status = "An error occurred during export.";
+                System.Diagnostics.Debug.WriteLine($"Export error: {ex}");
             }
         }
     }

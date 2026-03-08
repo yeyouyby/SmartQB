@@ -20,14 +20,11 @@ public class VectorService(ILLMService llmService, IServiceScopeFactory scopeFac
 
     public Task AddVectorAsync(int questionId, float[] vector)
     {
-        // In this implementation, the vector is already stored in SQLite within IngestionService.
-        // This method exists to satisfy the abstraction for future external vector DB integration.
-        // Explicitly logging as a no-op to avoid caller confusion since nothing is pushed externally yet.
         _logger.LogDebug("[No-Op] AddVectorAsync called for Question {QuestionId}. Vector data is currently persisted inside SQLite alongside the entity.", questionId);
         return Task.CompletedTask;
     }
 
-    public async Task<List<Question>> SearchSimilarAsync(string query, int limit = 10)
+    public async Task<List<Question>> SearchSimilarAsync(string query, int limit = 10, int? tagId = null)
     {
         var queryVector = await _llmService.GetEmbeddingAsync(query);
         if (queryVector.Length == 0) return new List<Question>();
@@ -36,15 +33,17 @@ public class VectorService(ILLMService llmService, IServiceScopeFactory scopeFac
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
 
-            // Limit candidates to 1000 to avoid loading too much into memory
-            var questions = await dbContext.Questions.AsNoTracking()
-                .Where(q => q.EmbeddingJson != null)
-                .Take(1000)
-                .ToListAsync();
+            IQueryable<Question> dbQuery = dbContext.Questions.Include(q => q.Tags).AsNoTracking().Where(q => q.EmbeddingJson != null);
+
+            if (tagId.HasValue)
+            {
+                dbQuery = dbQuery.Where(q => q.Tags.Any(t => t.Id == tagId.Value));
+            }
+
+            var questions = await dbQuery.Take(1000).ToListAsync();
 
             if (!questions.Any()) return new List<Question>();
 
-            // Calculate similarities in memory
             var ranked = questions
                 .Select(q => new { Question = q, Sim = TryGetSimilarity(q, queryVector) })
                 .Where(x => x.Sim.HasValue)

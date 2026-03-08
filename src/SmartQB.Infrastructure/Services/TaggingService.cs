@@ -27,7 +27,6 @@ public class TaggingService(ILLMService llmService, IVectorService vectorService
 
         if (string.IsNullOrWhiteSpace(tagDef)) return Task.CompletedTask;
 
-        // Fire and forget background task
         _ = Task.Run(async () =>
         {
             try
@@ -45,51 +44,35 @@ public class TaggingService(ILLMService llmService, IVectorService vectorService
 
     private async Task ProcessBackfillAsync(int tagId, string tagName, string tagDef)
     {
-        // 1. Find candidates using vector search
         var candidates = await _vectorService.SearchSimilarAsync(tagDef, limit: 50);
 
         if (!candidates.Any()) return;
 
-        // Use a single scope for the batch
         using (var scope = _scopeFactory.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
-
-            // We need to operate on questions within THIS context.
-            // Candidates came from VectorService which has closed its context.
-            // So we iterate through candidates and re-fetch them in the current context.
 
             foreach (var candidate in candidates)
             {
                 try
                 {
-                    // Re-fetch question with tags
                     var question = await dbContext.Questions
                         .Include(q => q.Tags)
                         .FirstOrDefaultAsync(q => q.Id == candidate.Id);
 
                     if (question == null) continue;
 
-                    // Skip if already tagged
                     if (question.Tags.Any(t => t.Id == tagId)) continue;
 
-                    // 2. Ask LLM
                     bool isMatch = await CheckTagMatchAsync(question, tagName, tagDef);
 
                     if (isMatch)
                     {
-                        // Fetch tag from this context to attach
-                        // Use FindAsync to get the tracked entity
                         var tagInContext = await dbContext.Tags.FindAsync(tagId);
 
-                        // If tag is not found in context (unlikely if passed from outside but good to check),
-                        // we might need to attach it, but FindAsync is safer.
                         if (tagInContext != null)
                         {
                             question.Tags.Add(tagInContext);
-                            // Save changes per question or batch?
-                            // Batching is better for perf, but individual is safer against partial failures.
-                            // Given "ProcessBackfillAsync" is background, saving per item is safer to progress.
                             await dbContext.SaveChangesAsync();
                             _logger.LogInformation("Auto-tagged Question {QuestionId} with {TagName}", question.Id, tagName);
                         }
@@ -122,7 +105,7 @@ Reply with strictly YES or NO.";
         return response?.Trim().ToUpper().StartsWith("YES") == true;
     }
 
-        public async Task TagQuestionAsync(int questionId)
+    public async Task TagQuestionAsync(int questionId)
     {
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
@@ -137,9 +120,6 @@ Reply with strictly YES or NO.";
             return;
         }
 
-        // Simplistic approach: Fetch all tags (or top N by some logic, maybe vector search using question embedding vs tag definition?)
-        // The PRD mentions "当添加新标签时，需逻辑回溯旧题库", but when adding a new question, we also need to tag it.
-        // We'll fetch all tags that have definitions and ask the LLM.
         var allTags = await dbContext.Tags.Where(t => t.Definition != null && t.Definition != "").ToListAsync();
 
         foreach (var tag in allTags)

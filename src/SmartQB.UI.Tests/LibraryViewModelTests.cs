@@ -22,7 +22,7 @@ public class LibraryViewModelTests
         };
         questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync()).ReturnsAsync(mockQuestions);
 
-        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
+        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<LibraryViewModel>>().Object);
 
         // Act
         await vm.LoadQuestionsAsync();
@@ -47,7 +47,7 @@ public class LibraryViewModelTests
         };
         vectorServiceMock.Setup(vs => vs.SearchSimilarAsync("test query", 10)).ReturnsAsync(searchResults);
 
-        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
+        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<LibraryViewModel>>().Object);
         vm.SearchQuery = "test query";
 
         // Act
@@ -73,7 +73,7 @@ public class LibraryViewModelTests
         };
         questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync()).ReturnsAsync(mockQuestions);
 
-        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
+        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<LibraryViewModel>>().Object);
         vm.SearchQuery = "";
 
         // Act
@@ -103,7 +103,7 @@ public class LibraryViewModelTests
         };
         questionServiceMock.Setup(qs => qs.GetAllQuestionsAsync()).ReturnsAsync(mockQuestions);
 
-        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
+        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<LibraryViewModel>>().Object);
 
         // Act - Set SelectedTag to trigger filtering
         vm.SelectedTag = tag1;
@@ -132,7 +132,7 @@ public class LibraryViewModelTests
         };
         vectorServiceMock.Setup(vs => vs.SearchSimilarAsync("test query", 10)).ReturnsAsync(searchResults);
 
-        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
+        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<LibraryViewModel>>().Object);
         vm.SearchQuery = "test query";
         vm.SelectedTag = tag1;
 
@@ -153,7 +153,7 @@ public class LibraryViewModelTests
         var vectorServiceMock = new Mock<IVectorService>();
         var taggingServiceMock = new Mock<ITaggingService>();
 
-        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
+        var vm = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<LibraryViewModel>>().Object);
         vm.SelectedTag = new Tag { Id = 1, Name = "Math" };
 
         // Act
