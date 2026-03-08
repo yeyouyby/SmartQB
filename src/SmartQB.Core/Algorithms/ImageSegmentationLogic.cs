@@ -3,11 +3,20 @@ using System.Collections.Generic;
 
 namespace SmartQB.Core.Algorithms;
 
+/// <summary>
+/// Provides logic for segmenting images based on row pixel densities.
+/// </summary>
 public static class ImageSegmentationLogic
 {
-    // Fix: cannot use ReadOnlySpan in an iterator method (yield return)
-    // We can change the return type to List and return at the end
-    public static IEnumerable<(int StartY, int EndY)> FindVerticalSegments(
+    /// <summary>
+    /// Identifies vertical segments within an image based on row ink densities.
+    /// </summary>
+    /// <param name="rowDensities">A span containing the ink density for each row of the image.</param>
+    /// <param name="noiseThreshold">The threshold below which a row is considered empty noise.</param>
+    /// <param name="minGapHeight">The minimum number of consecutive empty rows required to split segments.</param>
+    /// <param name="minSegmentHeight">The minimum height of a segment to be included in the results.</param>
+    /// <returns>A list of tuples containing the start and end Y-coordinates of each segment.</returns>
+    public static List<(int StartY, int EndY)> FindVerticalSegments(
         ReadOnlySpan<int> rowDensities,
         int noiseThreshold = 5,
         int minGapHeight = 30,
@@ -24,37 +33,30 @@ public static class ImageSegmentationLogic
 
         for (int y = 0; y < height; y++)
         {
-            // A row is considered 'empty' if the ink count is below the noise threshold
             bool isRowEmpty = rowDensities[y] < noiseThreshold;
 
-            if (isRowEmpty)
+            if (isRowEmpty && !inGap)
             {
-                if (!inGap)
-                {
-                    // Just entered a gap
-                    inGap = true;
-                    currentGapSize = 1;
-                }
-                else
-                {
-                    // Continuing in a gap
-                    currentGapSize++;
-                }
+                // Just entered a gap
+                inGap = true;
+                currentGapSize = 1;
             }
-            else
+            else if (isRowEmpty)
             {
-                if (inGap)
+                // Continuing in a gap
+                currentGapSize++;
+            }
+            else if (inGap)
+            {
+                // Just exited a gap. Check if the gap was big enough to split.
+                if (currentGapSize >= minGapHeight)
                 {
-                    // Just exited a gap. Check if the gap was big enough to split.
-                    if (currentGapSize >= minGapHeight)
-                    {
-                        // The optimal split point is the middle of the gap
-                        int splitY = y - (currentGapSize / 2);
-                        cutPoints.Add(splitY);
-                    }
-                    inGap = false;
-                    currentGapSize = 0;
+                    // The optimal split point is the middle of the gap
+                    int splitY = y - (currentGapSize / 2);
+                    cutPoints.Add(splitY);
                 }
+                inGap = false;
+                currentGapSize = 0;
             }
         }
 
