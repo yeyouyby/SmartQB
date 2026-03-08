@@ -14,12 +14,12 @@ public class MainViewModelTests
         versionServiceMock.Setup(vs => vs.GetVersion()).Returns("1.0.0");
 
         var ingestionServiceMock = new Mock<IIngestionService>();
-        var importVM = new ImportViewModel(ingestionServiceMock.Object);
+        var importVM = new ImportViewModel(ingestionServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<ImportViewModel>>().Object);
 
         var questionServiceMock = new Mock<IQuestionService>();
         var vectorServiceMock = new Mock<IVectorService>();
         var taggingServiceMock = new Mock<ITaggingService>();
-        var libraryVM = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object);
+        var libraryVM = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<LibraryViewModel>>().Object);
 
         var exportVM = new ExportViewModel(questionServiceMock.Object);
 

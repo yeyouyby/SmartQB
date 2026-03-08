@@ -3,12 +3,14 @@ using CommunityToolkit.Mvvm.Input;
 using SmartQB.Core.Interfaces;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace SmartQB.UI.ViewModels;
 
-public partial class ImportViewModel(IIngestionService ingestionService) : ObservableObject
+public partial class ImportViewModel(IIngestionService ingestionService, ILogger<ImportViewModel> logger) : ObservableObject
 {
     private readonly IIngestionService _ingestionService = ingestionService;
+    private readonly ILogger<ImportViewModel> _logger = logger;
 
     [ObservableProperty]
     private string _statusMessage = "Ready to import";
@@ -26,13 +28,13 @@ public partial class ImportViewModel(IIngestionService ingestionService) : Obser
 
         try
         {
-            // Removed Task.Run since ProcessPdfAsync is already async and IO-bound
             await _ingestionService.ProcessPdfAsync(filePath);
             StatusMessage = "Import completed successfully!";
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
+            _logger.LogError(ex, "Import failed for {FileName}", System.IO.Path.GetFileName(filePath));
+            StatusMessage = "An error occurred during import.";
         }
         finally
         {

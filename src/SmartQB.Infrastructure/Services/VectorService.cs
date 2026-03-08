@@ -20,14 +20,11 @@ public class VectorService(ILLMService llmService, IServiceScopeFactory scopeFac
 
     public Task AddVectorAsync(int questionId, float[] vector)
     {
-        // In this implementation, the vector is already stored in SQLite within IngestionService.
-        // This method exists to satisfy the abstraction for future external vector DB integration.
-        // Explicitly logging as a no-op to avoid caller confusion since nothing is pushed externally yet.
         _logger.LogDebug("[No-Op] AddVectorAsync called for Question {QuestionId}. Vector data is currently persisted inside SQLite alongside the entity.", questionId);
         return Task.CompletedTask;
     }
 
-    public async Task<List<Question>> SearchSimilarAsync(string query, int limit = 10)
+    public async Task<List<Question>> SearchSimilarAsync(string query, int limit = 10, int? tagId = null)
     {
         var queryVector = await _llmService.GetEmbeddingAsync(query);
         if (queryVector.Length == 0) return new List<Question>();
@@ -36,41 +33,54 @@ public class VectorService(ILLMService llmService, IServiceScopeFactory scopeFac
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
 
-            // Limit candidates to 1000 to avoid loading too much into memory
-            var questions = await dbContext.Questions.AsNoTracking()
-                .Where(q => q.EmbeddingJson != null)
-                .Take(1000)
-                .ToListAsync();
+            // Do not Include Tags here to prevent Cartesian explosion when taking 1000 items
+            IQueryable<Question> dbQuery = dbContext.Questions.AsNoTracking().Where(q => q.EmbeddingJson != null);
 
-            if (!questions.Any()) return new List<Question>();
+            if (tagId.HasValue)
+            {
+                dbQuery = dbQuery.Where(q => q.Tags.Any(t => t.Id == tagId.Value));
+            }
 
-            // Calculate similarities in memory
-            var ranked = questions
-                .Select(q => new { Question = q, Sim = TryGetSimilarity(q, queryVector) })
+            var candidates = await dbQuery.Select(q => new { q.Id, q.EmbeddingJson }).Take(1000).ToListAsync();
+
+            if (!candidates.Any()) return new List<Question>();
+
+            var rankedIds = candidates
+                .Select(q => new { q.Id, Sim = TryGetSimilarity(q.EmbeddingJson, queryVector) })
                 .Where(x => x.Sim.HasValue)
                 .OrderByDescending(x => x.Sim!.Value)
                 .Take(limit)
-                .Select(x => x.Question)
+                .Select(x => x.Id)
                 .ToList();
 
-            return ranked;
+            if (!rankedIds.Any()) return new List<Question>();
+
+            // Now fetch the actual entities for the top ranked IDs with their tags included
+            var finalQuestions = await dbContext.Questions
+                .Include(q => q.Tags)
+                .AsNoTracking()
+                .Where(q => rankedIds.Contains(q.Id))
+                .ToListAsync();
+
+            // The database might not return them in the ranked order, so sort them again
+            return finalQuestions.OrderBy(q => rankedIds.IndexOf(q.Id)).ToList();
         }
     }
 
-    private float? TryGetSimilarity(Question q, float[] queryVector)
+    private float? TryGetSimilarity(string? embeddingJson, float[] queryVector)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(q.EmbeddingJson)) return null;
+            if (string.IsNullOrWhiteSpace(embeddingJson)) return null;
 
-            var vector = JsonSerializer.Deserialize<float[]>(q.EmbeddingJson);
+            var vector = JsonSerializer.Deserialize<float[]>(embeddingJson);
             if (vector == null) return null;
 
             return CosineSimilarity(queryVector, vector);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to deserialize embedding for question {QuestionId}", q.Id);
+            _logger.LogWarning(ex, "Failed to deserialize embedding.");
             return null;
         }
     }

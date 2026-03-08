@@ -67,9 +67,9 @@ public partial class LibraryView : UserControl
                 UpdateWebView(vm.SelectedQuestion);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Initialization failed, safe to ignore for now as UpdateWebView checks _isWebViewInitialized
+            System.Diagnostics.Debug.WriteLine($"DetailsWebView init failed: {ex}");
         }
     }
 
@@ -102,14 +102,13 @@ public partial class LibraryView : UserControl
         sb.AppendLine("<main>");
         sb.AppendLine("<h1>Question Details</h1>");
 
-        // Do not HtmlEncode to allow LaTeX parsing by MathJax
-        var content = question.Content?.Replace("\n", "<br/>") ?? "";
+        var content = System.Web.HttpUtility.HtmlEncode(question.Content ?? "").Replace("\n", "<br/>");
         sb.AppendLine($"<div class='content'>{content}</div>");
         sb.AppendLine($"<div class='difficulty'>Difficulty: {question.Difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)}</div>");
 
         if (!string.IsNullOrWhiteSpace(question.LogicDescriptor))
         {
-            var logic = question.LogicDescriptor.Replace("\n", "<br/>");
+            var logic = System.Web.HttpUtility.HtmlEncode(question.LogicDescriptor ?? "").Replace("\n", "<br/>");
             sb.AppendLine("<div class='logic'>");
             sb.AppendLine("<div class='logic-title'>Logic Path:</div>");
             sb.AppendLine($"<div>{logic}</div>");
