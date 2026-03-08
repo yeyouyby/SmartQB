@@ -33,43 +33,54 @@ public class VectorService(ILLMService llmService, IServiceScopeFactory scopeFac
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<SmartQBDbContext>();
 
-            IQueryable<Question> dbQuery = dbContext.Questions.Include(q => q.Tags).AsNoTracking().Where(q => q.EmbeddingJson != null);
+            // Do not Include Tags here to prevent Cartesian explosion when taking 1000 items
+            IQueryable<Question> dbQuery = dbContext.Questions.AsNoTracking().Where(q => q.EmbeddingJson != null);
 
             if (tagId.HasValue)
             {
                 dbQuery = dbQuery.Where(q => q.Tags.Any(t => t.Id == tagId.Value));
             }
 
-            var questions = await dbQuery.Take(1000).ToListAsync();
+            var candidates = await dbQuery.Select(q => new { q.Id, q.EmbeddingJson }).Take(1000).ToListAsync();
 
-            if (!questions.Any()) return new List<Question>();
+            if (!candidates.Any()) return new List<Question>();
 
-            var ranked = questions
-                .Select(q => new { Question = q, Sim = TryGetSimilarity(q, queryVector) })
+            var rankedIds = candidates
+                .Select(q => new { q.Id, Sim = TryGetSimilarity(q.EmbeddingJson, queryVector) })
                 .Where(x => x.Sim.HasValue)
                 .OrderByDescending(x => x.Sim!.Value)
                 .Take(limit)
-                .Select(x => x.Question)
+                .Select(x => x.Id)
                 .ToList();
 
-            return ranked;
+            if (!rankedIds.Any()) return new List<Question>();
+
+            // Now fetch the actual entities for the top ranked IDs with their tags included
+            var finalQuestions = await dbContext.Questions
+                .Include(q => q.Tags)
+                .AsNoTracking()
+                .Where(q => rankedIds.Contains(q.Id))
+                .ToListAsync();
+
+            // The database might not return them in the ranked order, so sort them again
+            return finalQuestions.OrderBy(q => rankedIds.IndexOf(q.Id)).ToList();
         }
     }
 
-    private float? TryGetSimilarity(Question q, float[] queryVector)
+    private float? TryGetSimilarity(string? embeddingJson, float[] queryVector)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(q.EmbeddingJson)) return null;
+            if (string.IsNullOrWhiteSpace(embeddingJson)) return null;
 
-            var vector = JsonSerializer.Deserialize<float[]>(q.EmbeddingJson);
+            var vector = JsonSerializer.Deserialize<float[]>(embeddingJson);
             if (vector == null) return null;
 
             return CosineSimilarity(queryVector, vector);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to deserialize embedding for question {QuestionId}", q.Id);
+            _logger.LogWarning(ex, "Failed to deserialize embedding.");
             return null;
         }
     }

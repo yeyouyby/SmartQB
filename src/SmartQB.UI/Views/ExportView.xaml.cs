@@ -15,6 +15,7 @@ public partial class ExportView : UserControl
     private bool _isWebViewInitialized;
     private TaskCompletionSource<bool>? _navigationTcs;
     private EventHandler<CoreWebView2NavigationCompletedEventArgs>? _navigationHandler;
+    private bool _isExporting;
 
     public ExportView()
     {
@@ -26,7 +27,7 @@ public partial class ExportView : UserControl
         {
             if (_navigationTcs != null && !_navigationTcs.Task.IsCompleted)
             {
-                _navigationTcs.SetResult(args.IsSuccess);
+                _navigationTcs.TrySetResult(args.IsSuccess);
             }
         };
     }
@@ -35,8 +36,7 @@ public partial class ExportView : UserControl
     {
         await InitializeAsync();
 
-        // Always re-subscribe when loaded, ensuring we don't double subscribe
-        if (_isWebViewInitialized)
+        if (_isWebViewInitialized && _navigationHandler != null)
         {
             WebView.NavigationCompleted -= _navigationHandler;
             WebView.NavigationCompleted += _navigationHandler;
@@ -48,6 +48,12 @@ public partial class ExportView : UserControl
         if (_isWebViewInitialized && _navigationHandler != null)
         {
             WebView.NavigationCompleted -= _navigationHandler;
+        }
+
+        // Failsafe: if the view is unloaded during an export, cancel the pending wait
+        if (_navigationTcs != null && !_navigationTcs.Task.IsCompleted)
+        {
+            _navigationTcs.TrySetCanceled();
         }
     }
 
@@ -91,20 +97,37 @@ public partial class ExportView : UserControl
 
     private async void Export_Click(object sender, RoutedEventArgs e)
     {
-        if (!_isWebViewInitialized) return;
+        if (!_isWebViewInitialized || _isExporting) return;
 
-        if (DataContext is ExportViewModel vm)
+        _isExporting = true;
+        try
         {
-            vm.Status = "Generating HTML...";
-            try
+            if (DataContext is ExportViewModel vm)
             {
+                vm.Status = "Generating HTML...";
                 string html = await vm.GenerateHtmlAsync(IncludeAnswersCheck.IsChecked == true);
 
-                _navigationTcs = new TaskCompletionSource<bool>();
+                _navigationTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
                 WebView.NavigateToString(html);
 
                 vm.Status = "Waiting for render...";
-                bool navigationSuccess = await _navigationTcs.Task;
+
+                bool navigationSuccess;
+                try
+                {
+                    navigationSuccess = await _navigationTcs.Task;
+                }
+                catch (TaskCanceledException)
+                {
+                    vm.Status = "Export cancelled (View Unloaded).";
+                    return;
+                }
+
+                if (!navigationSuccess)
+                {
+                    vm.Status = "Failed to render paper.";
+                    return;
+                }
 
                 await Task.Delay(500);
 
@@ -131,11 +154,18 @@ public partial class ExportView : UserControl
                     vm.Status = "Failed to export PDF.";
                 }
             }
-            catch (Exception ex)
+        }
+        catch (Exception ex)
+        {
+            if (DataContext is ExportViewModel vm)
             {
                 vm.Status = "An error occurred during export.";
-                System.Diagnostics.Debug.WriteLine($"Export error: {ex}");
             }
+            System.Diagnostics.Debug.WriteLine($"Export error: {ex}");
+        }
+        finally
+        {
+            _isExporting = false;
         }
     }
 }

@@ -33,7 +33,7 @@ public partial class ImportViewModel(IIngestionService ingestionService, ILogger
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Import failed for {FilePath}", filePath);
+            _logger.LogError(ex, "Import failed for {FileName}", System.IO.Path.GetFileName(filePath));
             StatusMessage = "An error occurred during import.";
         }
         finally
