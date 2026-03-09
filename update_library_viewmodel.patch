@@ -1,0 +1,82 @@
+--- src/SmartQB.UI/ViewModels/LibraryViewModel.cs
++++ src/SmartQB.UI/ViewModels/LibraryViewModel.cs
+@@ -6,6 +6,7 @@
+ using System;
+ using System.Diagnostics;
+ using Microsoft.Extensions.Logging;
++using System.Threading;
+
+ namespace SmartQB.UI.ViewModels;
+
+@@ -16,6 +17,8 @@
+     private readonly Core.Interfaces.ITaggingService _taggingService = taggingService;
+     private readonly ILogger<LibraryViewModel> _logger = logger;
+
++    private CancellationTokenSource? _searchCts;
++
+     private bool _isInitialized;
+
+     public void Activate()
+@@ -43,7 +46,18 @@
+     private Question? _selectedQuestion;
+
+     [ObservableProperty]
+-    private string _searchQuery = string.Empty;
++    private string _searchQuery = string.Empty;
++
++    [ObservableProperty]
++    private bool _isSearching;
++
++    partial void OnSearchQueryChanged(string value)
++    {
++        _searchCts?.Cancel();
++        _searchCts = new CancellationTokenSource();
++
++        _ = DebouncedSearchAsync(value, _searchCts.Token);
++    }
+
+     [ObservableProperty]
+     private ObservableCollection<Tag> _tags = new();
+@@ -87,6 +101,23 @@
+         SelectedTag = null;
+     }
+
++    private async Task DebouncedSearchAsync(string query, CancellationToken token)
++    {
++        try
++        {
++            await Task.Delay(500, token); // 500ms debounce
++            if (!token.IsCancellationRequested)
++            {
++                await SearchAsync();
++            }
++        }
++        catch (TaskCanceledException)
++        {
++            // Ignore cancellation
++        }
++    }
++
+     [RelayCommand]
+     private async Task SearchAsync()
+     {
+@@ -96,8 +127,10 @@
+             return;
+         }
+
++        IsSearching = true;
+         try
+         {
+             var results = await _vectorService.SearchSimilarAsync(SearchQuery, 10, SelectedTag?.Id);
+             if (results != null)
+             {
+@@ -113,5 +146,9 @@
+             _logger.LogError(ex, "Search failed");
+             Questions = new ObservableCollection<Question>();
+         }
++        finally
++        {
++            IsSearching = false;
++        }
+     }
+ }

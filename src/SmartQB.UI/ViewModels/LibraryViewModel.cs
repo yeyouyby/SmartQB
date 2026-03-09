@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using System.Threading;
 
 namespace SmartQB.UI.ViewModels;
 
@@ -16,6 +17,7 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
     private readonly Core.Interfaces.ITaggingService _taggingService = taggingService;
     private readonly ILogger<LibraryViewModel> _logger = logger;
 
+    private CancellationTokenSource? _searchCts;
     private bool _isInitialized;
 
     public void Activate()
@@ -51,6 +53,17 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
 
     [ObservableProperty]
     private string _searchQuery = string.Empty;
+
+    [ObservableProperty]
+    private bool _isSearching;
+
+    partial void OnSearchQueryChanged(string value)
+    {
+        _searchCts?.Cancel();
+        _searchCts = new CancellationTokenSource();
+
+        _ = DebouncedSearchAsync(value, _searchCts.Token);
+    }
 
     [ObservableProperty]
     private ObservableCollection<Tag> _tags = new();
@@ -101,6 +114,22 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
         SelectedTag = null;
     }
 
+    private async Task DebouncedSearchAsync(string query, CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(500, token); // 500ms debounce
+            if (!token.IsCancellationRequested)
+            {
+                await SearchAsync();
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // Ignore cancellation
+        }
+    }
+
     [RelayCommand]
     private async Task SearchAsync()
     {
@@ -110,6 +139,7 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
             return;
         }
 
+        IsSearching = true;
         try
         {
             var results = await _vectorService.SearchSimilarAsync(SearchQuery, 10, SelectedTag?.Id);
@@ -126,6 +156,10 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
         {
             _logger.LogError(ex, "Search failed");
             Questions = new ObservableCollection<Question>();
+        }
+        finally
+        {
+            IsSearching = false;
         }
     }
 }

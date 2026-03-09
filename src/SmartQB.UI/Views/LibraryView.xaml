@@ -9,6 +9,9 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:LibraryViewModel}"
              d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
     <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -22,9 +25,11 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Search questions..." Margin="0,0,16,0" Style="{StaticResource MaterialDesignOutlinedTextBox}" HorizontalAlignment="Stretch" />
-                    <Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource MaterialDesignFlatButton}" VerticalAlignment="Center" />
+                    <ProgressBar Grid.Column="1" Style="{StaticResource MaterialDesignCircularProgressBar}" Value="0" IsIndeterminate="True" Visibility="{Binding IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,8,0" Width="24" Height="24" VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource MaterialDesignFlatButton}" VerticalAlignment="Center" />
                 </Grid>
                 <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
                     <Grid.ColumnDefinitions>
