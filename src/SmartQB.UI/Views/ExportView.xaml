@@ -16,11 +16,11 @@
         </Grid.RowDefinitions>
 
         <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16" HorizontalAlignment="Stretch">
-            <TextBlock Text="Export Paper" Style="{StaticResource MaterialDesignHeadline4TextBlock}" VerticalAlignment="Center" Margin="0,0,24,8"/>
+            <TextBlock Text="Export Paper" Style="{StaticResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Center" Margin="0,0,24,8"/>
             <CheckBox x:Name="IncludeAnswersCheck" Content="Include Answers (Teacher Edition)" Style="{StaticResource MaterialDesignCheckBox}" VerticalAlignment="Center" Margin="0,0,24,8" IsChecked="True"/>
             <Button Content="Preview HTML" Click="Preview_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,16,8"/>
-            <Button Content="Export to PDF" Click="Export_Click" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,0,0,8" materialDesign:ButtonAssist.CornerRadius="16"/>
-            <TextBlock Text="{Binding Status}" Style="{StaticResource MaterialDesignBody1TextBlock}" VerticalAlignment="Center" Margin="24,0,0,8" Foreground="{DynamicResource MaterialDesignPrimaryBrush}"/>
+            <Button Content="Export to PDF" Click="Export_Click" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,0,0,8"/>
+            <TextBlock Text="{Binding Status}" Style="{StaticResource MaterialDesignBody2TextBlock}" VerticalAlignment="Center" Margin="24,0,0,8" Foreground="{DynamicResource MaterialDesign.Brush.Foreground.Hint}"/>
         </WrapPanel>
 
         <!-- Hidden WebView for generating PDF, or shown for preview -->

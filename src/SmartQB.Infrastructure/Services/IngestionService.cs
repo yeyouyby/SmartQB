@@ -17,18 +17,15 @@ public class IngestionService(IPdfService pdfService, ILLMService llmService, IS
     private readonly ILogger<IngestionService> _logger = logger;
     private readonly ITaggingService _taggingService = taggingService;
 
-    public async Task ProcessPdfAsync(string filePath, IProgress<string>? progress = null)
+    public async Task ProcessPdfAsync(string filePath)
     {
         _logger.LogInformation("Starting ingestion for file: {FilePath}", filePath);
-        progress?.Report($"Analyzing PDF structure for {System.IO.Path.GetFileName(filePath)}...");
         int pageCount = _pdfService.GetPageCount(filePath);
-        progress?.Report($"Found {pageCount} pages. Starting extraction...");
 
         for (int i = 0; i < pageCount; i++)
         {
             try
             {
-                progress?.Report($"Processing page {i + 1} of {pageCount}: Rendering image...");
                 // Render page to image
                 byte[] imageBytes = await _pdfService.RenderPageAsync(filePath, i);
 
@@ -48,7 +45,6 @@ Format:
 }
 Ensure the output is valid JSON and contains no markdown code blocks.";
 
-                progress?.Report($"Processing page {i + 1} of {pageCount}: Running AI OCR and Structure Extraction...");
                 // Call LLM
                 string response = await _llmService.AnalyzeImageAsync(imageBytes, prompt);
 
@@ -61,7 +57,6 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
 
                 if (data != null && !string.IsNullOrWhiteSpace(data.Content))
                 {
-                    progress?.Report($"Processing page {i + 1} of {pageCount}: Generating logic embeddings...");
                     // Generate Embedding BEFORE saving to create an atomic transaction
                     string textToEmbed = !string.IsNullOrWhiteSpace(data.LogicDescriptor) ? data.LogicDescriptor : data.Content;
                     var embedding = await _llmService.GetEmbeddingAsync(textToEmbed);
@@ -121,12 +116,10 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing page {PageNumber} of {FilePath}", i + 1, filePath);
-                progress?.Report($"Error processing page {i + 1}. Continuing to next page...");
                 // Continue to next page
             }
         }
         _logger.LogInformation("Finished ingestion for file: {FilePath}", filePath);
-        progress?.Report("Import completed successfully!");
     }
 
     private string CleanJson(string response)

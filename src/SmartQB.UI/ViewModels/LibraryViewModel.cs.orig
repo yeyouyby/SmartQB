@@ -55,12 +55,18 @@ public partial class LibraryViewModel(Core.Interfaces.IQuestionService questionS
     [ObservableProperty]
     private ObservableCollection<Tag> _tags = new();
 
-    [ObservableProperty]
     private Tag? _selectedTag;
 
-    partial void OnSelectedTagChanged(Tag? value)
+    public Tag? SelectedTag
     {
-        _ = LoadQuestionsAsync();
+        get => _selectedTag;
+        set
+        {
+            if (SetProperty(ref _selectedTag, value))
+            {
+                _ = LoadQuestionsAsync();
+            }
+        }
     }
 
     public async Task LoadTagsAsync()

@@ -6,16 +6,8 @@
         xmlns:local="clr-namespace:SmartQB.UI"
         xmlns:vm="clr-namespace:SmartQB.UI.ViewModels"
         xmlns:views="clr-namespace:SmartQB.UI.Views"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="13"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}"
         Title="SmartQB" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:ImportViewModel}">
@@ -31,41 +23,26 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <Border Grid.Column="0" Background="{DynamicResource MaterialDesignPaper}" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,1,0">
-            <StackPanel Margin="0,32,0,0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
-                    <materialDesign:PackIcon Kind="Brain" Width="36" Height="36" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,12,0"/>
-                    <TextBlock Text="SmartQB" Style="{StaticResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Center" FontWeight="Bold"/>
-                </StackPanel>
-                <TextBlock Text="{Binding Version, StringFormat=v{0}}" Style="{StaticResource MaterialDesignCaptionTextBlock}" Foreground="{DynamicResource MaterialDesignBodyLight}" HorizontalAlignment="Center" Margin="0,0,0,32"/>
+        <Border Grid.Column="0" Background="#F3F4F6" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0">
+            <StackPanel Margin="0,20,0,0">
+                <TextBlock Text="SmartQB" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding Version, StringFormat=v{0}}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,30"/>
 
-                <Button Command="{Binding NavigateCommand}" CommandParameter="Import" Style="{StaticResource MaterialDesignFlatButton}" Margin="8,4" HorizontalContentAlignment="Left" Height="48">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="CloudUploadOutline" Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                        <TextBlock Text="Import PDFs" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding NavigateCommand}" CommandParameter="Library" Style="{StaticResource MaterialDesignFlatButton}" Margin="8,4" HorizontalContentAlignment="Left" Height="48">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="BookMultipleOutline" Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                        <TextBlock Text="Question Library" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding NavigateCommand}" CommandParameter="Export" Style="{StaticResource MaterialDesignFlatButton}" Margin="8,4" HorizontalContentAlignment="Left" Height="48">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="FileExportOutline" Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                        <TextBlock Text="Export Paper" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
+                <Button Content="Import PDFs" Command="{Binding NavigateCommand}" CommandParameter="Import"
+                        Margin="10,5" Padding="10" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left"/>
+                <Button Content="Question Library" Command="{Binding NavigateCommand}" CommandParameter="Library"
+                        Margin="10,5" Padding="10" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left"/>
+                <Button Content="Export Paper" Command="{Binding NavigateCommand}" CommandParameter="Export"
+                        Margin="10,5" Padding="10" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left"/>
             </StackPanel>
         </Border>
 
         <!-- Main Content -->
-        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" Margin="16"/>
+        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" Margin="20"/>
     </Grid>
 </Window>
