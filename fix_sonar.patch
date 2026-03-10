@@ -1,0 +1,25 @@
+--- src/SmartQB.UI/ViewModels/LibraryViewModel.cs
++++ src/SmartQB.UI/ViewModels/LibraryViewModel.cs
+@@ -57,17 +57,11 @@
+     private ObservableCollection<Tag> _tags = new();
+
+-    private Tag? _selectedTag;
+-
+-    public Tag? SelectedTag
++    [ObservableProperty]
++    private Tag? _selectedTag;
++
++    partial void OnSelectedTagChanged(Tag? value)
+     {
+-        get => _selectedTag;
+-        set
+-        {
+-            if (SetProperty(ref _selectedTag, value))
+-            {
+-                _ = LoadQuestionsAsync();
+-            }
+-        }
++        _ = LoadQuestionsAsync();
+     }
+
+     public async Task LoadTagsAsync()
