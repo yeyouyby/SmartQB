@@ -26,10 +26,14 @@ public partial class ImportViewModel(IIngestionService ingestionService, ILogger
         IsBusy = true;
         StatusMessage = $"Processing {System.IO.Path.GetFileName(filePath)}...";
 
+        var progress = new Progress<string>(msg =>
+        {
+            StatusMessage = msg;
+        });
+
         try
         {
-            await _ingestionService.ProcessPdfAsync(filePath);
-            StatusMessage = "Import completed successfully!";
+            await _ingestionService.ProcessPdfAsync(filePath, progress);
         }
         catch (Exception ex)
         {
