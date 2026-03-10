@@ -17,15 +17,17 @@ public class IngestionService(IPdfService pdfService, ILLMService llmService, IS
     private readonly ILogger<IngestionService> _logger = logger;
     private readonly ITaggingService _taggingService = taggingService;
 
-    public async Task ProcessPdfAsync(string filePath)
+    public async Task ProcessPdfAsync(string filePath, IProgress<string>? progress = null)
     {
         _logger.LogInformation("Starting ingestion for file: {FilePath}", filePath);
+        progress?.Report("Analyzing document structure...");
         int pageCount = _pdfService.GetPageCount(filePath);
 
         for (int i = 0; i < pageCount; i++)
         {
             try
             {
+                progress?.Report($"Processing page {i + 1} of {pageCount}...");
                 // Render page to image
                 byte[] imageBytes = await _pdfService.RenderPageAsync(filePath, i);
 
@@ -80,6 +82,8 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
                             question.EmbeddingJson = JsonSerializer.Serialize(embedding);
                         }
 
+                        progress?.Report($"Saving extracted question from page {i + 1}...");
+
                         // 1. Save to SQLite atomically (this populates question.Id)
                         dbContext.Questions.Add(question);
                         await dbContext.SaveChangesAsync();
@@ -119,6 +123,7 @@ Ensure the output is valid JSON and contains no markdown code blocks.";
                 // Continue to next page
             }
         }
+        progress?.Report("Import completed successfully!");
         _logger.LogInformation("Finished ingestion for file: {FilePath}", filePath);
     }
 
