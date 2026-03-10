@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:SmartQB.UI.Views"
              xmlns:vm="clr-namespace:SmartQB.UI.ViewModels"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:ImportViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -14,15 +15,21 @@
 
     <Grid>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Border BorderBrush="Gray" BorderThickness="2" CornerRadius="10"
-                    Width="400" Height="200" AllowDrop="True" Drop="Border_Drop" Background="Transparent">
-                <TextBlock Text="Drag PDF here" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
-            </Border>
+            <materialDesign:Card Width="400" Height="200" Padding="0" UniformCornerRadius="10">
+                <Border BorderBrush="{DynamicResource PrimaryHueMidBrush}" BorderThickness="2" CornerRadius="10"
+                        AllowDrop="True" Drop="Border_Drop" Background="Transparent" SnapsToDevicePixels="True">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <materialDesign:PackIcon Kind="FileUpload" Width="64" Height="64" HorizontalAlignment="Center" Foreground="{DynamicResource MaterialDesign.Brush.Foreground.Hint}"/>
+                        <TextBlock Text="Drag and drop PDF here" Style="{StaticResource MaterialDesignHeadline6TextBlock}" Margin="0,16,0,0" HorizontalAlignment="Center" Foreground="{DynamicResource MaterialDesign.Brush.Foreground.Hint}"/>
+                    </StackPanel>
+                </Border>
+            </materialDesign:Card>
 
-            <TextBlock Text="{Binding StatusMessage}" Margin="0,20,0,0" HorizontalAlignment="Center" FontSize="16"/>
+            <TextBlock Text="{Binding StatusMessage}" Margin="0,24,0,0" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
 
-            <ProgressBar IsIndeterminate="True" Height="20" Width="400" Margin="0,10,0,0"
-                         Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <ProgressBar IsIndeterminate="True" Width="400" Margin="0,16,0,0"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"
+                         Style="{StaticResource MaterialDesignCircularProgressBar}"/>
         </StackPanel>
     </Grid>
 </UserControl>
