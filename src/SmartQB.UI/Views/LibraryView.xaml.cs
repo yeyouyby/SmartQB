@@ -102,13 +102,13 @@ public partial class LibraryView : UserControl
         sb.AppendLine("<main>");
         sb.AppendLine("<h1>Question Details</h1>");
 
-        var content = System.Web.HttpUtility.HtmlEncode(question.Content ?? "").Replace("\n", "<br/>");
+        var content = (question.Content ?? "").Replace("\n", "<br/>");
         sb.AppendLine($"<div class='content'>{content}</div>");
         sb.AppendLine($"<div class='difficulty'>Difficulty: {question.Difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)}</div>");
 
         if (!string.IsNullOrWhiteSpace(question.LogicDescriptor))
         {
-            var logic = System.Web.HttpUtility.HtmlEncode(question.LogicDescriptor ?? "").Replace("\n", "<br/>");
+            var logic = (question.LogicDescriptor ?? "").Replace("\n", "<br/>");
             sb.AppendLine("<div class='logic'>");
             sb.AppendLine("<div class='logic-title'>Logic Path:</div>");
             sb.AppendLine($"<div>{logic}</div>");

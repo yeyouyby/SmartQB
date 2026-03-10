@@ -53,12 +53,12 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
             sb.AppendLine("<div class='question'>");
             sb.AppendLine($"<h3>Question {qIndex} (Difficulty: {q.Difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)})</h3>");
             // Do not HtmlEncode the content to let MathJax parse LaTeX ($...$)
-            var content = System.Web.HttpUtility.HtmlEncode(q.Content ?? "").Replace("\n", "<br/>");
+            var content = (q.Content ?? "").Replace("\n", "<br/>");
             sb.AppendLine($"<p>{content}</p>");
 
             if (includeAnswers)
             {
-                var answer = System.Web.HttpUtility.HtmlEncode(q.LogicDescriptor ?? "No logic provided.").Replace("\n", "<br/>");
+                var answer = (q.LogicDescriptor ?? "No logic provided.").Replace("\n", "<br/>");
                 sb.AppendLine("<div class='answer'>");
                 sb.AppendLine("<strong>Logic/Answer:</strong><br/>");
                 sb.AppendLine($"<p>{answer}</p>");
