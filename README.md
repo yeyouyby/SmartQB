@@ -65,20 +65,3 @@ To keep your API keys secure and prevent them from being committed to source con
 * [Product Requirements Document (PRD)](PRD.md) - Detailed business requirements and use cases.
 * `nextdo.md` - Agent task tracking and handoff status.
 
-## 🛠️ Architecture Decisions (ADR)
-
-### ADR-001: Decoupling Image Segmentation Algorithm from SkiaSharp
-
-* **Status**: Accepted
-* **Date**: 2024-02-28
-* **Context**: The `PdfService` was calculating horizontal row ink densities and processing the segmentation math using native `SkiaSharp` APIs, intertwining domain logic with infrastructure libraries. Testing this logic required loading real images and configuring native test runners, which is error-prone.
-* **Decision**: We decoupled the domain logic by abstracting the segmentation algorithm into a platform-agnostic, pure C# static class named `ImageSegmentationLogic` in `SmartQB.Core`. The infrastructure layer (`PdfService`) now processes images to compute the row densities, and feeds a `ReadOnlySpan<int>` to the logic class.
-* **Consequences**: Memory access is optimized using `ReadOnlySpan<int>`. Core logic is perfectly testable across any platform (like CI/CD Linux runners) without needing SkiaSharp binaries. Unit tests mock the integer density arrays directly, eliminating native library runtime errors during testing.
-
-### ADR-002: Using [ObservableProperty] and Partial Methods for ViewModels
-
-* **Status**: Accepted
-* **Date**: 2024-03-10
-* **Context**: When binding UI elements to ViewModels, developers were manually creating properties and setters to trigger side effects (like data loading), leading to verbose code and potential `CommunityToolkit.Mvvm` anti-patterns.
-* **Decision**: We adopted the convention of using the `[ObservableProperty]` attribute on private fields and implementing the generated `partial void On[PropertyName]Changed(T value)` method to handle side effects.
-* **Consequences**: This approach significantly reduces boilerplate code, ensures `OnPropertyChanged` is raised correctly before side effects occur, and aligns with the best practices of the `CommunityToolkit.Mvvm` library.
