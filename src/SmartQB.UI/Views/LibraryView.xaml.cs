@@ -13,6 +13,7 @@ namespace SmartQB.UI.Views;
 public partial class LibraryView : UserControl
 {
     private bool _isWebViewInitialized;
+    private bool _isLoaded;
 
     public LibraryView()
     {
@@ -24,19 +25,22 @@ public partial class LibraryView : UserControl
 
     private async void OnLoaded(object sender, System.Windows.RoutedEventArgs e)
     {
+        _isLoaded = true;
         await InitializeAsync();
 
-        if (DataContext is LibraryViewModel vm)
+        if (_isLoaded && DataContext is LibraryViewModel vm)
         {
             vm.Activate();
             _ = vm.LoadTagsAsync();
             _ = vm.LoadQuestionsAsync();
+            vm.PropertyChanged -= OnViewModelPropertyChanged;
             vm.PropertyChanged += OnViewModelPropertyChanged;
         }
     }
 
     private void OnUnloaded(object sender, System.Windows.RoutedEventArgs e)
     {
+        _isLoaded = false;
         if (DataContext is LibraryViewModel vm)
         {
             vm.Deactivate();
@@ -62,7 +66,7 @@ public partial class LibraryView : UserControl
             await DetailsWebView.EnsureCoreWebView2Async(env);
             _isWebViewInitialized = true;
 
-            if (DataContext is LibraryViewModel vm && vm.SelectedQuestion != null)
+            if (_isLoaded && DataContext is LibraryViewModel vm && vm.SelectedQuestion != null)
             {
                 UpdateWebView(vm.SelectedQuestion);
             }

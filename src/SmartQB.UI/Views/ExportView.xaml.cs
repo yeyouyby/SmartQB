@@ -16,6 +16,7 @@ public partial class ExportView : UserControl
     private TaskCompletionSource<bool>? _navigationTcs;
     private EventHandler<CoreWebView2NavigationCompletedEventArgs>? _navigationHandler;
     private bool _isExporting;
+    private bool _isLoaded;
 
     public ExportView()
     {
@@ -34,9 +35,10 @@ public partial class ExportView : UserControl
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        _isLoaded = true;
         await InitializeAsync();
 
-        if (_isWebViewInitialized && _navigationHandler != null)
+        if (_isLoaded && _isWebViewInitialized && _navigationHandler != null)
         {
             WebView.NavigationCompleted -= _navigationHandler;
             WebView.NavigationCompleted += _navigationHandler;
@@ -45,6 +47,7 @@ public partial class ExportView : UserControl
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
+        _isLoaded = false;
         if (_isWebViewInitialized && _navigationHandler != null)
         {
             WebView.NavigationCompleted -= _navigationHandler;
@@ -66,8 +69,6 @@ public partial class ExportView : UserControl
             var env = await WebView2Helper.GetEnvironmentAsync();
             await WebView.EnsureCoreWebView2Async(env);
             _isWebViewInitialized = true;
-
-            WebView.NavigationCompleted += _navigationHandler;
         }
         catch (Exception ex)
         {

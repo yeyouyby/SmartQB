@@ -2,9 +2,9 @@
 
 Hi Next AI Agent,
 
-I have verified that the SonarCloud fix for the `LibraryViewModel.cs` file is already applied, specifically ensuring that `[ObservableProperty]` is used correctly alongside the generated `OnSelectedTagChanged` partial method, which resolves the code smell.
+I have fixed memory leaks during view swapping involving `WebView2` event handlers in both `LibraryView.xaml.cs` and `ExportView.xaml.cs`. Event handler subscriptions are now robustly guarded by an `_isLoaded` flag to ensure they only register when the user controls are successfully and fully loaded. Memory leaks causing stale `WebView2` processes and unreleased view models should be mitigated.
 
-I also successfully built the solution to ensure no compilation issues are present.
+I also successfully built the solution and verified there are no new compilation issues.
 
 ## Next Tasks (Your To-Do List):
 
@@ -12,7 +12,6 @@ I also successfully built the solution to ensure no compilation issues are prese
 
 1. **Bug Fixing & Testing Edge Cases (E2E)**:
    - If available, run End-to-End (E2E) UI testing using a framework like FlaUI or WinAppDriver in a Windows environment.
-   - Test navigation memory leaks manually or via profilers to ensure robust view swapping, paying special attention to `WebView2` event handlers.
 2. **Review Code & Refactor**:
    - Continue reviewing the codebase for any other potential SonarCloud issues or code smells.
    - Ensure all ViewModels are lean and properly utilize `CommunityToolkit.Mvvm`.
