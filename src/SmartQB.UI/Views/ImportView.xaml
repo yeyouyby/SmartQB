@@ -21,7 +21,7 @@
                        Foreground="{DynamicResource MaterialDesign.Brush.Foreground.Hint}"
                        HorizontalAlignment="Center" Margin="0,0,0,40" TextWrapping="Wrap" TextAlignment="Center"/>
 
-            <Border BorderBrush="{DynamicResource PrimaryHueLightBrush}" BorderThickness="2" CornerRadius="12"
+            <Border BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Light}" BorderThickness="2" CornerRadius="12"
                     Width="500" Height="250" AllowDrop="True" Drop="Border_Drop" MouseLeftButtonDown="Border_MouseLeftButtonDown" Background="#FAFAFA"
                     Cursor="Hand">
                 <Border.Style>
@@ -29,23 +29,23 @@
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="#F0F8FF" />
-                                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <materialDesign:PackIcon Kind="FilePdfBox" Width="64" Height="64" Foreground="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+                    <materialDesign:PackIcon Kind="FilePdfBox" Width="64" Height="64" Foreground="{DynamicResource MaterialDesign.Brush.Primary}" HorizontalAlignment="Center" Margin="0,0,0,16"/>
                     <TextBlock Text="请将 PDF 试卷拖拽至此处" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource MaterialDesignBody}"/>
                     <TextBlock Text="支持多页、图文混排的 PDF 文档" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" Foreground="Gray" Margin="0,8,0,0"/>
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="{Binding StatusMessage}" Margin="0,30,0,0" HorizontalAlignment="Center" FontSize="16" FontWeight="Medium" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+            <TextBlock Text="{Binding StatusMessage}" Margin="0,30,0,0" HorizontalAlignment="Center" FontSize="16" FontWeight="Medium" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
 
             <ProgressBar IsIndeterminate="True" Height="6" Width="500" Margin="0,20,0,0"
                          Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"
-                         Foreground="{DynamicResource PrimaryHueMidBrush}" Background="#E0E0E0"/>
+                         Foreground="{DynamicResource MaterialDesign.Brush.Primary}" Background="#E0E0E0"/>
         </StackPanel>
     </Grid>
 </UserControl>

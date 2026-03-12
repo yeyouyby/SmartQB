@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,24" HorizontalAlignment="Stretch">
-            <materialDesign:PackIcon Kind="FileDocumentMultipleOutline" Width="28" Height="28" Margin="0,0,10,8" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+            <materialDesign:PackIcon Kind="FileDocumentMultipleOutline" Width="28" Height="28" Margin="0,0,10,8" VerticalAlignment="Center" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
             <TextBlock Text="组卷导出" Style="{StaticResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Center" Margin="0,0,32,8"/>
 
             <CheckBox x:Name="IncludeAnswersCheck" Content="包含答案解析 (教师版)" Style="{StaticResource MaterialDesignCheckBox}" VerticalAlignment="Center" Margin="0,0,32,8" IsChecked="False"/>
@@ -32,7 +32,7 @@
                 </Button.ContentTemplate>
             </Button>
 
-            <Button Content="导出 PDF" Click="Export_Click" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,0,0,8">
+            <Button Content="导出 PDF" Click="Export_Click" Style="{StaticResource MaterialDesignFilledButton}" Margin="0,0,0,8">
                 <Button.ContentTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -43,7 +43,7 @@
                 </Button.ContentTemplate>
             </Button>
 
-            <TextBlock Text="{Binding Status}" Style="{StaticResource MaterialDesignBody2TextBlock}" VerticalAlignment="Center" Margin="24,0,0,8" Foreground="{DynamicResource PrimaryHueMidBrush}" FontWeight="Medium"/>
+            <TextBlock Text="{Binding Status}" Style="{StaticResource MaterialDesignBody2TextBlock}" VerticalAlignment="Center" Margin="24,0,0,8" Foreground="{DynamicResource MaterialDesign.Brush.Primary}" FontWeight="Medium"/>
         </WrapPanel>
 
         <!-- Hidden WebView for generating PDF, or shown for preview -->

@@ -18,7 +18,7 @@
         <Border Grid.Column="0" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,1,0" Margin="0,0,24,0" Padding="0,0,24,0">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,20">
-                    <materialDesign:PackIcon Kind="DatabaseSearch" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <materialDesign:PackIcon Kind="DatabaseSearch" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                     <TextBlock Text="全部题目" Style="{StaticResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Center"/>
                 </StackPanel>
 
@@ -28,7 +28,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="搜索题目逻辑或标签..." Margin="0,0,16,0" Style="{StaticResource MaterialDesignOutlinedTextBox}" HorizontalAlignment="Stretch" />
-                    <Button Grid.Column="1" Content="搜索" Command="{Binding SearchCommand}" Style="{StaticResource MaterialDesignFlatButton}" VerticalAlignment="Center">
+                    <Button Grid.Column="1" Content="搜索" Command="{Binding SearchCommand}" Style="{StaticResource MaterialDesignTextButton}" VerticalAlignment="Center">
                         <Button.ContentTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -46,7 +46,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <materialDesign:PackIcon Grid.Column="0" Kind="TagOutline" Width="20" Height="20" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <materialDesign:PackIcon Grid.Column="0" Kind="TagOutline" Width="20" Height="20" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                     <TextBlock Grid.Column="0" Text="按标签过滤：" VerticalAlignment="Center" Margin="30,0,8,0" Style="{StaticResource MaterialDesignBody1TextBlock}" />
                     <ComboBox Grid.Column="1" ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}" materialDesign:HintAssist.Hint="选择一个标签" DisplayMemberPath="Name" Style="{StaticResource MaterialDesignOutlinedComboBox}" HorizontalAlignment="Stretch" />
                     <Button Grid.Column="2" Content="清除" Command="{Binding ClearFilterCommand}" Margin="16,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" VerticalAlignment="Center">
