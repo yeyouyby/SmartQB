@@ -47,11 +47,11 @@ public partial class SettingsViewModel : ObservableObject
         try
         {
             await _settingsService.SaveAsync();
-            MessageBox.Show("Settings saved successfully.", "SmartQB", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("设置保存成功。", "SmartQB 提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (System.Exception ex)
         {
-            MessageBox.Show($"Failed to save settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"保存设置失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

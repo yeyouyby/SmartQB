@@ -80,16 +80,16 @@ public partial class ExportView : UserControl
         if (!_isWebViewInitialized) return;
         if (DataContext is ExportViewModel vm)
         {
-            vm.Status = "Generating Preview...";
+            vm.Status = "正在生成预览...";
             try
             {
                 string html = await vm.GenerateHtmlAsync(IncludeAnswersCheck.IsChecked == true);
                 WebView.NavigateToString(html);
-                vm.Status = "Preview Ready";
+                vm.Status = "预览准备就绪";
             }
             catch (Exception ex)
             {
-                vm.Status = "Error generating preview.";
+                vm.Status = "生成预览时出错。";
                 System.Diagnostics.Debug.WriteLine($"Preview error: {ex}");
             }
         }
@@ -104,13 +104,13 @@ public partial class ExportView : UserControl
         {
             if (DataContext is ExportViewModel vm)
             {
-                vm.Status = "Generating HTML...";
+                vm.Status = "正在生成 HTML...";
                 string html = await vm.GenerateHtmlAsync(IncludeAnswersCheck.IsChecked == true);
 
                 _navigationTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
                 WebView.NavigateToString(html);
 
-                vm.Status = "Waiting for render...";
+                vm.Status = "等待渲染完成...";
 
                 bool navigationSuccess;
                 try
@@ -119,19 +119,19 @@ public partial class ExportView : UserControl
                 }
                 catch (TaskCanceledException)
                 {
-                    vm.Status = "Export cancelled (View Unloaded).";
+                    vm.Status = "导出已取消（视图已卸载）。";
                     return;
                 }
 
                 if (!navigationSuccess)
                 {
-                    vm.Status = "Failed to render paper.";
+                    vm.Status = "渲染试卷失败。";
                     return;
                 }
 
                 await Task.Delay(500);
 
-                vm.Status = "Printing to PDF...";
+                vm.Status = "正在输出 PDF...";
 
                 string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 string desktopPath = Path.Combine(downloadsPath, "Desktop");
@@ -147,11 +147,11 @@ public partial class ExportView : UserControl
 
                 if (success)
                 {
-                    vm.Status = $"Saved to {filePath}";
+                    vm.Status = $"已保存至 {filePath}";
                 }
                 else
                 {
-                    vm.Status = "Failed to export PDF.";
+                    vm.Status = "导出 PDF 失败。";
                 }
             }
         }
@@ -159,7 +159,7 @@ public partial class ExportView : UserControl
         {
             if (DataContext is ExportViewModel vm)
             {
-                vm.Status = "An error occurred during export.";
+                vm.Status = "导出过程中发生错误。";
             }
             System.Diagnostics.Debug.WriteLine($"Export error: {ex}");
         }

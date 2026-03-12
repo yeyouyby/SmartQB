@@ -79,7 +79,7 @@ public partial class LibraryView : UserControl
 
         if (question == null)
         {
-            DetailsWebView.NavigateToString("<html><body><p>Select a question to view details.</p></body></html>");
+            DetailsWebView.NavigateToString("<html><body><p>请选择左侧题目以查看详情。</p></body></html>");
             return;
         }
 
@@ -88,7 +88,7 @@ public partial class LibraryView : UserControl
         sb.AppendLine("<html lang='en'>");
         sb.AppendLine("<head>");
         sb.AppendLine("<meta charset='utf-8'>");
-        sb.AppendLine("<title>Question Details</title>");
+        sb.AppendLine("<title>题目详情</title>");
         sb.AppendLine("<style>");
         sb.AppendLine("body { font-family: sans-serif; padding: 20px; }");
         sb.AppendLine(".difficulty { color: #666; font-size: 0.9em; margin-bottom: 20px; }");
@@ -100,17 +100,17 @@ public partial class LibraryView : UserControl
         sb.AppendLine("</head>");
         sb.AppendLine("<body>");
         sb.AppendLine("<main>");
-        sb.AppendLine("<h1>Question Details</h1>");
+        sb.AppendLine("<h1>题目详情</h1>");
 
         var content = System.Web.HttpUtility.HtmlEncode(question.Content ?? "").Replace("\n", "<br/>");
         sb.AppendLine($"<div class='content'>{content}</div>");
-        sb.AppendLine($"<div class='difficulty'>Difficulty: {question.Difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)}</div>");
+        sb.AppendLine($"<div class='difficulty'>难度系数: {question.Difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)}</div>");
 
         if (!string.IsNullOrWhiteSpace(question.LogicDescriptor))
         {
             var logic = System.Web.HttpUtility.HtmlEncode(question.LogicDescriptor ?? "").Replace("\n", "<br/>");
             sb.AppendLine("<div class='logic'>");
-            sb.AppendLine("<div class='logic-title'>Logic Path:</div>");
+            sb.AppendLine("<div class='logic-title'>解析与逻辑路径:</div>");
             sb.AppendLine($"<div>{logic}</div>");
             sb.AppendLine("</div>");
         }

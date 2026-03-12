@@ -17,6 +17,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private object _currentViewModel;
 
+    [ObservableProperty]
+    private string _currentRoute = "Import";
+
     public ImportViewModel ImportVM { get; }
     public LibraryViewModel LibraryVM { get; }
     public ExportViewModel ExportVM { get; }
@@ -42,6 +45,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Navigate(string destination)
     {
+        CurrentRoute = destination;
         switch (destination)
         {
             case "Import":

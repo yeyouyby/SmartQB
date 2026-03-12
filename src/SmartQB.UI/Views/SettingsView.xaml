@@ -9,44 +9,60 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
              d:DesignHeight="600" d:DesignWidth="800">
-    <Grid Background="White" Margin="20">
+    <Grid Background="White" Margin="40">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Settings" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,20"/>
+        <TextBlock Grid.Row="0" Text="系统设置" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Margin="0,0,0,30" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel MaxWidth="600" HorizontalAlignment="Left">
 
-                <TextBlock Text="AI Configuration" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,15"/>
+                <materialDesign:Card Padding="30" Margin="0,0,0,30" UniformCornerRadius="8" Background="#FAFAFA" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="1">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,25">
+                            <materialDesign:PackIcon Kind="Robot" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <TextBlock Text="AI 大模型配置" Style="{StaticResource MaterialDesignHeadline6TextBlock}" VerticalAlignment="Center"/>
+                        </StackPanel>
 
-                <TextBox Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
-                         materialDesign:HintAssist.Hint="API Key"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Margin="0,0,0,20" FontSize="14" />
+                        <TextBox Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+                                 materialDesign:HintAssist.Hint="API 密钥 (API Key)"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 Margin="0,0,0,5" FontSize="14" />
+                        <TextBlock Text="留空则使用默认配置或本地用户机密。"
+                                   FontSize="12" Foreground="Gray" Margin="0,0,0,25"/>
 
-                <TextBlock Text="Leave empty to use user-secrets or appsettings.json fallback."
-                           FontSize="12" Foreground="Gray" Margin="0,-15,0,20"/>
+                        <TextBox Text="{Binding BaseUrl, UpdateSourceTrigger=PropertyChanged}"
+                                 materialDesign:HintAssist.Hint="接口地址 (Base URL - 可选)"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 Margin="0,0,0,5" FontSize="14" />
+                        <TextBlock Text="例如: https://api.deepseek.com/v1"
+                                   FontSize="12" Foreground="Gray" Margin="0,0,0,25"/>
 
-                <TextBox Text="{Binding BaseUrl, UpdateSourceTrigger=PropertyChanged}"
-                         materialDesign:HintAssist.Hint="Base URL (Optional)"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Margin="0,0,0,20" FontSize="14" />
+                        <TextBox Text="{Binding ModelId, UpdateSourceTrigger=PropertyChanged}"
+                                 materialDesign:HintAssist.Hint="模型名称 (Model ID)"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 Margin="0,0,0,10" FontSize="14" />
+                        <TextBlock Text="例如: gpt-4o, deepseek-chat"
+                                   FontSize="12" Foreground="Gray" Margin="0,0,0,30"/>
 
-                <TextBlock Text="Example: https://api.deepseek.com/v1"
-                           FontSize="12" Foreground="Gray" Margin="0,-15,0,20"/>
-
-                <TextBox Text="{Binding ModelId, UpdateSourceTrigger=PropertyChanged}"
-                         materialDesign:HintAssist.Hint="Model ID"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Margin="0,0,0,30" FontSize="14" />
-
-                <Button Content="Save Settings"
-                        Command="{Binding SaveSettingsCommand}"
-                        Style="{StaticResource MaterialDesignRaisedButton}"
-                        HorizontalAlignment="Left" Width="150" Height="40" FontSize="16"/>
+                        <Button Content="保存设置"
+                                Command="{Binding SaveSettingsCommand}"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                HorizontalAlignment="Right" Width="150" Height="40" FontSize="16">
+                            <Button.ContentTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="ContentSave" Width="20" Height="20" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Button.ContentTemplate>
+                        </Button>
+                    </StackPanel>
+                </materialDesign:Card>
 
             </StackPanel>
         </ScrollViewer>

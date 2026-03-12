@@ -15,7 +15,7 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
     private readonly IQuestionService _questionService = questionService;
 
     [ObservableProperty]
-    private string _status = "Ready to export";
+    private string _status = "准备就绪";
 
     /// <summary>
     /// Generates the HTML representation of the question paper, optionally including logic descriptors as answers.
@@ -32,7 +32,7 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
         sb.AppendLine("<html lang='en'>");
         sb.AppendLine("<head>");
         sb.AppendLine("<meta charset='utf-8'>");
-        sb.AppendLine("<title>SmartQB Paper</title>");
+        sb.AppendLine("<title>SmartQB 生成试卷</title>");
         // Basic styling
         sb.AppendLine("<style>");
         sb.AppendLine("body { font-family: sans-serif; margin: 40px; }");
@@ -45,22 +45,22 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
         sb.AppendLine("</head>");
         sb.AppendLine("<body>");
         sb.AppendLine("<main>");
-        sb.AppendLine("<h1>Generated Paper</h1>");
+        sb.AppendLine("<h1>试卷预览</h1>");
 
         int qIndex = 1;
         foreach (var q in questions)
         {
             sb.AppendLine("<div class='question'>");
-            sb.AppendLine($"<h3>Question {qIndex} (Difficulty: {q.Difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)})</h3>");
+            sb.AppendLine($"<h3>第 {qIndex}题 (难度系数: {q.Difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)})</h3>");
             // Do not HtmlEncode the content to let MathJax parse LaTeX ($...$)
             var content = System.Web.HttpUtility.HtmlEncode(q.Content ?? "").Replace("\n", "<br/>");
             sb.AppendLine($"<p>{content}</p>");
 
             if (includeAnswers)
             {
-                var answer = System.Web.HttpUtility.HtmlEncode(q.LogicDescriptor ?? "No logic provided.").Replace("\n", "<br/>");
+                var answer = System.Web.HttpUtility.HtmlEncode(q.LogicDescriptor ?? "暂无解析或逻辑路径。").Replace("\n", "<br/>");
                 sb.AppendLine("<div class='answer'>");
-                sb.AppendLine("<strong>Logic/Answer:</strong><br/>");
+                sb.AppendLine("<strong>解析与逻辑路径:</strong><br/>");
                 sb.AppendLine($"<p>{answer}</p>");
                 sb.AppendLine("</div>");
             }
