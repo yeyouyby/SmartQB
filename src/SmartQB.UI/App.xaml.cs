@@ -17,7 +17,6 @@ public partial class App : Application
 {
     public static IHost? AppHost { get; private set; }
 
-
     public App()
     {
         // Global exception handlers
@@ -95,7 +94,6 @@ public partial class App : Application
         MessageBox.Show($"Application crashed ({source}). See crash.log for details.\n\n{ex?.Message}", "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);
         Environment.Exit(1);
     }
-
 
     protected override async void OnStartup(StartupEventArgs e)
     {
