@@ -19,6 +19,9 @@
         <DataTemplate DataType="{x:Type vm:ExportViewModel}">
             <views:ExportView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -40,6 +43,9 @@
                 Style="{StaticResource MaterialDesignFlatButton}" Foreground="#333333"
                 Margin="10,5" Padding="10" HorizontalContentAlignment="Left"/>
         <Button Content="Export Paper" Command="{Binding NavigateCommand}" CommandParameter="Export"
+                Style="{StaticResource MaterialDesignFlatButton}" Foreground="#333333"
+                Margin="10,5" Padding="10" HorizontalContentAlignment="Left"/>
+        <Button Content="Settings" Command="{Binding NavigateCommand}" CommandParameter="Settings"
                 Style="{StaticResource MaterialDesignFlatButton}" Foreground="#333333"
                 Margin="10,5" Padding="10" HorizontalContentAlignment="Left"/>
             </StackPanel>

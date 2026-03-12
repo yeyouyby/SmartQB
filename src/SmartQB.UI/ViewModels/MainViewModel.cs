@@ -20,12 +20,14 @@ public partial class MainViewModel : ObservableObject
     public ImportViewModel ImportVM { get; }
     public LibraryViewModel LibraryVM { get; }
     public ExportViewModel ExportVM { get; }
+    public SettingsViewModel SettingsVM { get; }
 
-    public MainViewModel(ImportViewModel importVM, LibraryViewModel libraryVM, ExportViewModel exportVM, IVersionService versionService)
+    public MainViewModel(ImportViewModel importVM, LibraryViewModel libraryVM, ExportViewModel exportVM, SettingsViewModel settingsVM, IVersionService versionService)
     {
         ImportVM = importVM;
         LibraryVM = libraryVM;
         ExportVM = exportVM;
+        SettingsVM = settingsVM;
         _versionService = versionService;
         _version = versionService.GetVersion();
         _currentViewModel = importVM;
@@ -50,6 +52,9 @@ public partial class MainViewModel : ObservableObject
                 break;
             case "Export":
                 CurrentViewModel = ExportVM;
+                break;
+            case "Settings":
+                CurrentViewModel = SettingsVM;
                 break;
         }
     }

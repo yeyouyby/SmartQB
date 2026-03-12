@@ -22,8 +22,10 @@ public class MainViewModelTests
         var libraryVM = new LibraryViewModel(questionServiceMock.Object, vectorServiceMock.Object, taggingServiceMock.Object, new Mock<Microsoft.Extensions.Logging.ILogger<LibraryViewModel>>().Object);
 
         var exportVM = new ExportViewModel(questionServiceMock.Object);
+        var settingsServiceMock = new Mock<ISettingsService>();
+        var settingsVM = new SettingsViewModel(settingsServiceMock.Object);
 
-        var mainVM = new MainViewModel(importVM, libraryVM, exportVM, versionServiceMock.Object);
+        var mainVM = new MainViewModel(importVM, libraryVM, exportVM, settingsVM, versionServiceMock.Object);
 
         // Act & Assert
         mainVM.NavigateCommand.Execute("Library");
@@ -34,5 +36,8 @@ public class MainViewModelTests
 
         mainVM.NavigateCommand.Execute("Import");
         Assert.Equal(importVM, mainVM.CurrentViewModel);
+
+        mainVM.NavigateCommand.Execute("Settings");
+        Assert.Equal(settingsVM, mainVM.CurrentViewModel);
     }
 }

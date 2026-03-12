@@ -30,6 +30,8 @@ public partial class App : Application
                 // Core & Infrastructure Services
                 services.AddLogging(configure => configure.AddDebug());
 
+                services.AddSingleton<ISettingsService, SettingsService>();
+
                 services.AddSingleton<ITaggingService, TaggingService>();
                 services.AddSingleton<IQuestionService, QuestionService>();
 
@@ -48,10 +50,12 @@ public partial class App : Application
                 // LLM Service
                 services.AddSingleton<ILLMService>(sp =>
                 {
+                    var settings = sp.GetRequiredService<ISettingsService>();
                     var config = sp.GetRequiredService<IConfiguration>();
-                    var apiKey = config["AI:ApiKey"] ?? throw new InvalidOperationException("AI:ApiKey is missing");
-                    var modelId = config["AI:ModelId"] ?? "gpt-4o";
-                    return new LLMService(apiKey, modelId);
+                    // Ensure settings are loaded on startup
+                    Task.Run(() => settings.LoadAsync()).GetAwaiter().GetResult();
+
+                    return new LLMService(settings, config);
                 });
 
                 // Database
