@@ -20,7 +20,6 @@ public partial class ImportViewModel(IIngestionService ingestionService, ILogger
 
     public event EventHandler? ImportCompleted;
 
-
     [RelayCommand]
     private async Task ProcessFileAsync(string filePath)
     {
