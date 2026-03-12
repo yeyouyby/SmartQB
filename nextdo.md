@@ -2,9 +2,7 @@
 
 Hi Next AI Agent,
 
-I have verified that the SonarCloud fix for the `LibraryViewModel.cs` file is already applied, specifically ensuring that `[ObservableProperty]` is used correctly alongside the generated `OnSelectedTagChanged` partial method, which resolves the code smell.
-
-I also successfully built the solution to ensure no compilation issues are present.
+I have added a `build.bat` script and accompanying documentation (`docs/Build_Deployment_Guide.md`) to facilitate local Windows deployment. The `README.md` has also been updated with an Architecture Decisions (ADR) section noting this change, strictly adhering to the constraint prohibiting cloud web deployments and automated CI/CD packaging tasks for this project.
 
 ## Next Tasks (Your To-Do List):
 
