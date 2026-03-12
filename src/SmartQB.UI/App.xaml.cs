@@ -84,18 +84,17 @@ public partial class App : Application
         }
     }
 
-    private void LogCrash(Exception? ex, string source)
+    private static void LogCrash(Exception? ex, string source)
     {
-        var msg = $"[{DateTime.Now}] CRASH in {source}: {ex?.Message}\n{ex?.StackTrace}\n";
+        var msg = $"[{DateTime.Now}] CRASH in {source}: {ex?.Message ?? "Unknown"}\n{ex?.StackTrace ?? "No StackTrace"}\n";
         if (ex?.InnerException != null)
         {
-            msg += $"Inner: {ex?.InnerException?.Message}\n{ex?.InnerException?.StackTrace}\n";
+            msg += $"Inner: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}\n";
         }
-        try { File.AppendAllText("crash.log", msg); } catch { }
+        try { File.AppendAllText("crash.log", msg); } catch (Exception writeEx) { System.Diagnostics.Debug.WriteLine($"Failed to write crash log: {writeEx}"); }
         MessageBox.Show($"Application crashed ({source}). See crash.log for details.\n\n{ex?.Message}", "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);
         Environment.Exit(1);
     }
-
 
 
     protected override async void OnStartup(StartupEventArgs e)
@@ -126,7 +125,6 @@ public partial class App : Application
             LogCrash(ex, "OnStartup");
         }
     }
-
 
     protected override async void OnExit(ExitEventArgs e)
     {
