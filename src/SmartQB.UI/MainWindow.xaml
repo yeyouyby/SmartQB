@@ -31,7 +31,7 @@
             <views:SettingsView />
         </DataTemplate>
 
-        <Style x:Key="NavButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+        <Style x:Key="NavButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignTextButton}">
             <Setter Property="Foreground" Value="#333333"/>
             <Setter Property="Margin" Value="10,5"/>
             <Setter Property="Padding" Value="10"/>
@@ -57,7 +57,7 @@
         <!-- Sidebar -->
         <Border Grid.Column="0" Background="#F3F4F6" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0" CornerRadius="0">
             <StackPanel Margin="0,20,0,0">
-                <TextBlock Text="SmartQB 智能题库" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,5" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                <TextBlock Text="SmartQB 智能题库" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,5" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                 <TextBlock Text="{Binding Version, StringFormat=v{0}}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,30"/>
 
                 <Button Command="{Binding NavigateCommand}" CommandParameter="Import" ToolTip="拖拽PDF试卷自动录入">
@@ -66,8 +66,8 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentRoute}" Value="Import">
                                     <Setter Property="Background" Value="#E0E0E0"/>
-                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -84,8 +84,8 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentRoute}" Value="Library">
                                     <Setter Property="Background" Value="#E0E0E0"/>
-                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -102,8 +102,8 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentRoute}" Value="Export">
                                     <Setter Property="Background" Value="#E0E0E0"/>
-                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -120,8 +120,8 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentRoute}" Value="Settings">
                                     <Setter Property="Background" Value="#E0E0E0"/>
-                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

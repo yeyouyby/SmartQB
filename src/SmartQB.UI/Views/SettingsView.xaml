@@ -15,7 +15,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="系统设置" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Margin="0,0,0,30" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+        <TextBlock Grid.Row="0" Text="系统设置" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Margin="0,0,0,30" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel MaxWidth="600" HorizontalAlignment="Left">
@@ -23,7 +23,7 @@
                 <materialDesign:Card Padding="30" Margin="0,0,0,30" UniformCornerRadius="8" Background="#FAFAFA" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="1">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,25">
-                            <materialDesign:PackIcon Kind="Robot" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Kind="Robot" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                             <TextBlock Text="AI 大模型配置" Style="{StaticResource MaterialDesignHeadline6TextBlock}" VerticalAlignment="Center"/>
                         </StackPanel>
 
@@ -50,7 +50,7 @@
 
                         <Button Content="保存设置"
                                 Command="{Binding SaveSettingsCommand}"
-                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                Style="{StaticResource MaterialDesignFilledButton}"
                                 HorizontalAlignment="Right" Width="150" Height="40" FontSize="16">
                             <Button.ContentTemplate>
                                 <DataTemplate>
