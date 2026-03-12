@@ -65,3 +65,6 @@ To keep your API keys secure and prevent them from being committed to source con
 * [Product Requirements Document (PRD)](PRD.md) - Detailed business requirements and use cases.
 * `nextdo.md` - Agent task tracking and handoff status.
 
+
+## 🛠️ Architecture Decisions (ADR)
+* **Local Deployment Script**: A `build.bat` script and accompanying `docs/Build_Deployment_Guide.md` have been introduced to standardize and automate local Windows desktop deployment, strictly adhering to the constraint prohibiting cloud web deployments and automated CI/CD packaging tasks for this project.
