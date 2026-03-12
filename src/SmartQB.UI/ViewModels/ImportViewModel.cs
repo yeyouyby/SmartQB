@@ -18,6 +18,8 @@ public partial class ImportViewModel(IIngestionService ingestionService, ILogger
     [ObservableProperty]
     private bool _isBusy;
 
+    public event EventHandler? ImportCompleted;
+
     [RelayCommand]
     private async Task ProcessFileAsync(string filePath)
     {
@@ -30,6 +32,7 @@ public partial class ImportViewModel(IIngestionService ingestionService, ILogger
         {
             await _ingestionService.ProcessPdfAsync(filePath);
             StatusMessage = "Import completed successfully!";
+            ImportCompleted?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {
