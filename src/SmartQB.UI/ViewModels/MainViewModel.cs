@@ -7,19 +7,31 @@ namespace SmartQB.UI.ViewModels;
 /// <summary>
 /// Root ViewModel that handles global navigation and basic application states.
 /// </summary>
-public partial class MainViewModel(ImportViewModel importVM, LibraryViewModel libraryVM, ExportViewModel exportVM, IVersionService versionService) : ObservableObject
+public partial class MainViewModel : ObservableObject
 {
-    private readonly IVersionService _versionService = versionService;
+    private readonly IVersionService _versionService;
 
     [ObservableProperty]
-    private string _version = versionService.GetVersion();
+    private string _version;
 
     [ObservableProperty]
-    private object _currentViewModel = importVM;
+    private object _currentViewModel;
 
-    public ImportViewModel ImportVM { get; } = importVM;
-    public LibraryViewModel LibraryVM { get; } = libraryVM;
-    public ExportViewModel ExportVM { get; } = exportVM;
+    public ImportViewModel ImportVM { get; }
+    public LibraryViewModel LibraryVM { get; }
+    public ExportViewModel ExportVM { get; }
+
+    public MainViewModel(ImportViewModel importVM, LibraryViewModel libraryVM, ExportViewModel exportVM, IVersionService versionService)
+    {
+        ImportVM = importVM;
+        LibraryVM = libraryVM;
+        ExportVM = exportVM;
+        _versionService = versionService;
+        _version = versionService.GetVersion();
+        _currentViewModel = importVM;
+
+        ImportVM.ImportCompleted += (s, e) => Navigate("Library");
+    }
 
     /// <summary>
     /// Switches the active view model based on navigation requests from the sidebar.
