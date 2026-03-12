@@ -55,6 +55,8 @@ public partial class MainViewModel : ObservableObject
                 break;
             case "Settings":
                 CurrentViewModel = SettingsVM;
+                // Trigger async initialization when navigating to Settings
+                _ = SettingsVM.InitializeAsync();
                 break;
         }
     }

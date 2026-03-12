@@ -15,9 +15,9 @@ public class LLMService : ILLMService
     private readonly ISettingsService _settings;
     private readonly IConfiguration _config;
     private ChatClient? _chatClient;
-    private string _currentApiKey;
-    private string _currentBaseUrl;
-    private string _currentModelId;
+    private string? _currentApiKey;
+    private string? _currentBaseUrl;
+    private string? _currentModelId;
     private EmbeddingClient? _embeddingClient;
 
     public LLMService(ISettingsService settings, IConfiguration config)
@@ -30,7 +30,8 @@ public class LLMService : ILLMService
     private void RefreshClients()
     {
         var apiKey = string.IsNullOrEmpty(_settings.ApiKey) ? _config["AI:ApiKey"] : _settings.ApiKey;
-        var modelId = string.IsNullOrEmpty(_settings.ModelId) ? (_config["AI:ModelId"] ?? "gpt-4o") : _settings.ModelId;
+        var modelIdFromSettings = string.IsNullOrEmpty(_settings.ModelId) ? _config["AI:ModelId"] : _settings.ModelId;
+        var modelId = string.IsNullOrEmpty(modelIdFromSettings) ? new SettingsData().ModelId : modelIdFromSettings;
         var embeddingModelId = "text-embedding-3-small";
         var baseUrl = _settings.BaseUrl;
 

@@ -1,4 +1,5 @@
 using SmartQB.Core.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -15,6 +16,7 @@ public class SettingsData
 
 public class SettingsService : ISettingsService
 {
+    private readonly Microsoft.Extensions.Logging.ILogger<SettingsService> _logger;
     private readonly string _settingsFilePath;
     private SettingsData _data;
 
@@ -36,8 +38,9 @@ public class SettingsService : ISettingsService
         set => _data.ModelId = value;
     }
 
-    public SettingsService()
+    public SettingsService(Microsoft.Extensions.Logging.ILogger<SettingsService> logger)
     {
+        _logger = logger;
         var appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SmartQB");
         if (!Directory.Exists(appDataFolder))
         {
@@ -49,30 +52,43 @@ public class SettingsService : ISettingsService
 
     public async Task LoadAsync()
     {
-        if (File.Exists(_settingsFilePath))
+        if (!File.Exists(_settingsFilePath))
         {
-            try
-            {
-                var json = await File.ReadAllTextAsync(_settingsFilePath).ConfigureAwait(false);
-                _data = JsonSerializer.Deserialize<SettingsData>(json) ?? new SettingsData();
-            }
-            catch
-            {
-                _data = new SettingsData(); // Fallback on error
-            }
+            _data = new SettingsData();
+            return;
+        }
+
+        try
+        {
+            var json = await File.ReadAllTextAsync(_settingsFilePath).ConfigureAwait(false);
+            _data = JsonSerializer.Deserialize<SettingsData>(json) ?? new SettingsData();
+        }
+        catch (FileNotFoundException)
+        {
+            _data = new SettingsData();
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize settings from {SettingsFilePath}", _settingsFilePath);
+            _data = new SettingsData();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while loading settings from {SettingsFilePath}", _settingsFilePath);
+            _data = new SettingsData();
         }
     }
-
     public async Task SaveAsync()
     {
         try
         {
             var json = JsonSerializer.Serialize(_data, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(_settingsFilePath, json);
+            await File.WriteAllTextAsync(_settingsFilePath, json).ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex)
         {
-            // Logging can be added here
+            _logger.LogError(ex, "Failed to save settings to {SettingsFilePath}", _settingsFilePath);
+            throw; // Let the caller handle it (e.g. ViewModel showing error message)
         }
     }
 }

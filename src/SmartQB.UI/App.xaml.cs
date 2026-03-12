@@ -53,7 +53,6 @@ public partial class App : Application
                     var settings = sp.GetRequiredService<ISettingsService>();
                     var config = sp.GetRequiredService<IConfiguration>();
                     // Ensure settings are loaded on startup
-                    Task.Run(() => settings.LoadAsync()).GetAwaiter().GetResult();
 
                     return new LLMService(settings, config);
                 });
@@ -76,6 +75,10 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         await AppHost!.StartAsync();
+
+        // Load settings asynchronously before doing any other UI initialization
+        var settings = AppHost.Services.GetRequiredService<ISettingsService>();
+        await settings.LoadAsync();
 
         // Ensure Database is Created
         using (var scope = AppHost.Services.CreateScope())

@@ -22,7 +22,11 @@ public partial class SettingsViewModel : ObservableObject
     public SettingsViewModel(ISettingsService settingsService)
     {
         _settingsService = settingsService;
-        LoadSettingsCommand.Execute(null);
+    }
+
+    public Task InitializeAsync()
+    {
+        return LoadSettingsAsync();
     }
 
     [RelayCommand]
@@ -31,7 +35,7 @@ public partial class SettingsViewModel : ObservableObject
         await _settingsService.LoadAsync();
         ApiKey = _settingsService.ApiKey;
         BaseUrl = _settingsService.BaseUrl;
-        ModelId = string.IsNullOrEmpty(_settingsService.ModelId) ? "gpt-4o" : _settingsService.ModelId;
+        ModelId = _settingsService.ModelId;
     }
 
     [RelayCommand]
@@ -40,8 +44,14 @@ public partial class SettingsViewModel : ObservableObject
         _settingsService.ApiKey = ApiKey;
         _settingsService.BaseUrl = BaseUrl;
         _settingsService.ModelId = ModelId;
-        await _settingsService.SaveAsync();
-
-        MessageBox.Show("Settings saved successfully.", "SmartQB", MessageBoxButton.OK, MessageBoxImage.Information);
+        try
+        {
+            await _settingsService.SaveAsync();
+            MessageBox.Show("Settings saved successfully.", "SmartQB", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (System.Exception ex)
+        {
+            MessageBox.Show($"Failed to save settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }
