@@ -72,6 +72,7 @@ public partial class App : Application
                             services.AddSingleton<ImportViewModel>();
                             services.AddSingleton<LibraryViewModel>();
                             services.AddSingleton<ExportViewModel>();
+                            services.AddSingleton<SettingsViewModel>();
 
                             services.AddSingleton<MainWindow>();
                             services.AddSingleton<MainViewModel>();
