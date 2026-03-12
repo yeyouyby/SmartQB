@@ -16,8 +16,7 @@
         FontFamily="{DynamicResource MaterialDesignFont}"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
-        Title="SmartQB 智能题库" Height="768" Width="1024" WindowStartupLocation="CenterScreen"
-        Icon="pack://application:,,,/MaterialDesignColors;component/Resources/MaterialDesignThemes.Wpf.ico">
+        Title="SmartQB 智能题库" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:ImportViewModel}">
             <views:ImportView />

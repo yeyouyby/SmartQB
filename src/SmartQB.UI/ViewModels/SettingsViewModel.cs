@@ -51,7 +51,8 @@ public partial class SettingsViewModel : ObservableObject
         }
         catch (System.Exception ex)
         {
-            MessageBox.Show($"保存设置失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Diagnostics.Debug.WriteLine($"Failed to save settings: {ex}");
+            MessageBox.Show("保存设置失败，请检查输入或查看日志。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

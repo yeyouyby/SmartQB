@@ -63,7 +63,6 @@ To keep your API keys secure and prevent them from being committed to source con
 ## 📂 Documentation
 
 * [Product Requirements Document (PRD)](PRD.md) - Detailed business requirements and use cases.
-* `nextdo.md` - Agent task tracking and handoff status.
 
 
 ## 🛠️ Architecture Decisions (ADR)

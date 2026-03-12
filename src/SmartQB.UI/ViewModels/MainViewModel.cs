@@ -45,20 +45,23 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Navigate(string destination)
     {
-        CurrentRoute = destination;
         switch (destination)
         {
             case "Import":
                 CurrentViewModel = ImportVM;
+                CurrentRoute = destination;
                 break;
             case "Library":
                 CurrentViewModel = LibraryVM;
+                CurrentRoute = destination;
                 break;
             case "Export":
                 CurrentViewModel = ExportVM;
+                CurrentRoute = destination;
                 break;
             case "Settings":
                 CurrentViewModel = SettingsVM;
+                CurrentRoute = destination;
                 // Trigger async initialization when navigating to Settings
                 _ = SettingsVM.InitializeAsync();
                 break;

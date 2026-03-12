@@ -29,7 +29,7 @@ public partial class ExportViewModel(IQuestionService questionService) : Observa
 
         var sb = new StringBuilder();
         sb.AppendLine("<!DOCTYPE html>");
-        sb.AppendLine("<html lang='en'>");
+        sb.AppendLine("<html lang='zh'>");
         sb.AppendLine("<head>");
         sb.AppendLine("<meta charset='utf-8'>");
         sb.AppendLine("<title>SmartQB 生成试卷</title>");

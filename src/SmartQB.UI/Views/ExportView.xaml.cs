@@ -84,8 +84,19 @@ public partial class ExportView : UserControl
             try
             {
                 string html = await vm.GenerateHtmlAsync(IncludeAnswersCheck.IsChecked == true);
+
+                _navigationTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
                 WebView.NavigateToString(html);
-                vm.Status = "预览准备就绪";
+
+                bool success = await _navigationTcs.Task;
+                if (success)
+                {
+                    vm.Status = "预览准备就绪";
+                }
+                else
+                {
+                    vm.Status = "生成预览时出错。";
+                }
             }
             catch (Exception ex)
             {

@@ -27,7 +27,7 @@
                             <TextBlock Text="AI 大模型配置" Style="{StaticResource MaterialDesignHeadline6TextBlock}" VerticalAlignment="Center"/>
                         </StackPanel>
 
-                        <TextBox Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+                        <PasswordBox x:Name="ApiKeyPasswordBox" PasswordChanged="ApiKeyPasswordBox_PasswordChanged"
                                  materialDesign:HintAssist.Hint="API 密钥 (API Key)"
                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  Margin="0,0,0,5" FontSize="14" />
