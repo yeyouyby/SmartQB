@@ -30,6 +30,8 @@ public partial class App : Application
                 // Core & Infrastructure Services
                 services.AddLogging(configure => configure.AddDebug());
 
+                services.AddSingleton<ISettingsService, SettingsService>();
+
                 services.AddSingleton<ITaggingService, TaggingService>();
                 services.AddSingleton<IQuestionService, QuestionService>();
 
@@ -48,10 +50,11 @@ public partial class App : Application
                 // LLM Service
                 services.AddSingleton<ILLMService>(sp =>
                 {
+                    var settings = sp.GetRequiredService<ISettingsService>();
                     var config = sp.GetRequiredService<IConfiguration>();
-                    var apiKey = config["AI:ApiKey"] ?? throw new InvalidOperationException("AI:ApiKey is missing");
-                    var modelId = config["AI:ModelId"] ?? "gpt-4o";
-                    return new LLMService(apiKey, modelId);
+                    // Ensure settings are loaded on startup
+
+                    return new LLMService(settings, config);
                 });
 
                 // Database
@@ -72,6 +75,10 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         await AppHost!.StartAsync();
+
+        // Load settings asynchronously before doing any other UI initialization
+        var settings = AppHost.Services.GetRequiredService<ISettingsService>();
+        await settings.LoadAsync();
 
         // Ensure Database is Created
         using (var scope = AppHost.Services.CreateScope())
