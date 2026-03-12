@@ -9,22 +9,45 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:ExportViewModel}"
              d:DesignHeight="600" d:DesignWidth="800">
-    <Grid Margin="16">
+    <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16" HorizontalAlignment="Stretch">
-            <TextBlock Text="Export Paper" Style="{StaticResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Center" Margin="0,0,24,8"/>
-            <CheckBox x:Name="IncludeAnswersCheck" Content="Include Answers (Teacher Edition)" Style="{StaticResource MaterialDesignCheckBox}" VerticalAlignment="Center" Margin="0,0,24,8" IsChecked="True"/>
-            <Button Content="Preview HTML" Click="Preview_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,16,8"/>
-            <Button Content="Export to PDF" Click="Export_Click" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,0,0,8"/>
-            <TextBlock Text="{Binding Status}" Style="{StaticResource MaterialDesignBody2TextBlock}" VerticalAlignment="Center" Margin="24,0,0,8" Foreground="{DynamicResource MaterialDesign.Brush.Foreground.Hint}"/>
+        <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,24" HorizontalAlignment="Stretch">
+            <materialDesign:PackIcon Kind="FileDocumentMultipleOutline" Width="28" Height="28" Margin="0,0,10,8" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+            <TextBlock Text="组卷导出" Style="{StaticResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Center" Margin="0,0,32,8"/>
+
+            <CheckBox x:Name="IncludeAnswersCheck" Content="包含答案解析 (教师版)" Style="{StaticResource MaterialDesignCheckBox}" VerticalAlignment="Center" Margin="0,0,32,8" IsChecked="False"/>
+
+            <Button Content="预览试卷" Click="Preview_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,16,8">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="EyeOutline" Width="18" Height="18" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+
+            <Button Content="导出 PDF" Click="Export_Click" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,0,0,8">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="FilePdfBox" Width="18" Height="18" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+
+            <TextBlock Text="{Binding Status}" Style="{StaticResource MaterialDesignBody2TextBlock}" VerticalAlignment="Center" Margin="24,0,0,8" Foreground="{DynamicResource PrimaryHueMidBrush}" FontWeight="Medium"/>
         </WrapPanel>
 
         <!-- Hidden WebView for generating PDF, or shown for preview -->
-        <Border Grid.Row="1" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="1" CornerRadius="8" Padding="16">
+        <Border Grid.Row="1" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="1" CornerRadius="8" Padding="16" Background="White">
             <wv2:WebView2 x:Name="WebView" />
         </Border>
     </Grid>

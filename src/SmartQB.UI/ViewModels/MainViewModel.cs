@@ -17,6 +17,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private object _currentViewModel;
 
+    [ObservableProperty]
+    private string _currentRoute = "Import";
+
     public ImportViewModel ImportVM { get; }
     public LibraryViewModel LibraryVM { get; }
     public ExportViewModel ExportVM { get; }
@@ -46,15 +49,19 @@ public partial class MainViewModel : ObservableObject
         {
             case "Import":
                 CurrentViewModel = ImportVM;
+                CurrentRoute = destination;
                 break;
             case "Library":
                 CurrentViewModel = LibraryVM;
+                CurrentRoute = destination;
                 break;
             case "Export":
                 CurrentViewModel = ExportVM;
+                CurrentRoute = destination;
                 break;
             case "Settings":
                 CurrentViewModel = SettingsVM;
+                CurrentRoute = destination;
                 // Trigger async initialization when navigating to Settings
                 _ = SettingsVM.InitializeAsync();
                 break;

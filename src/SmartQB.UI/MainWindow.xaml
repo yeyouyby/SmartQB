@@ -6,9 +6,17 @@
         xmlns:local="clr-namespace:SmartQB.UI"
         xmlns:vm="clr-namespace:SmartQB.UI.ViewModels"
         xmlns:views="clr-namespace:SmartQB.UI.Views"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
-        Title="SmartQB" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
+        Title="SmartQB 智能题库" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:ImportViewModel}">
             <views:ImportView />
@@ -22,36 +30,111 @@
         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
             <views:SettingsView />
         </DataTemplate>
+
+        <Style x:Key="NavButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="Margin" Value="10,5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="BorderThickness" Value="4,0,0,0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E0E0E0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <Border Grid.Column="0" Background="#F3F4F6" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Background="#F3F4F6" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0" CornerRadius="0">
             <StackPanel Margin="0,20,0,0">
-                <TextBlock Text="SmartQB" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                <TextBlock Text="SmartQB 智能题库" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,5" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 <TextBlock Text="{Binding Version, StringFormat=v{0}}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,30"/>
 
-                <Button Content="Import PDFs" Command="{Binding NavigateCommand}" CommandParameter="Import"
-                Style="{StaticResource MaterialDesignFlatButton}" Foreground="#333333"
-                Margin="10,5" Padding="10" HorizontalContentAlignment="Left"/>
-        <Button Content="Question Library" Command="{Binding NavigateCommand}" CommandParameter="Library"
-                Style="{StaticResource MaterialDesignFlatButton}" Foreground="#333333"
-                Margin="10,5" Padding="10" HorizontalContentAlignment="Left"/>
-        <Button Content="Export Paper" Command="{Binding NavigateCommand}" CommandParameter="Export"
-                Style="{StaticResource MaterialDesignFlatButton}" Foreground="#333333"
-                Margin="10,5" Padding="10" HorizontalContentAlignment="Left"/>
-        <Button Content="Settings" Command="{Binding NavigateCommand}" CommandParameter="Settings"
-                Style="{StaticResource MaterialDesignFlatButton}" Foreground="#333333"
-                Margin="10,5" Padding="10" HorizontalContentAlignment="Left"/>
+                <Button Command="{Binding NavigateCommand}" CommandParameter="Import" ToolTip="拖拽PDF试卷自动录入">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentRoute}" Value="Import">
+                                    <Setter Property="Background" Value="#E0E0E0"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="FileImport" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="导入试卷 (PDF)" VerticalAlignment="Center" FontWeight="Medium"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding NavigateCommand}" CommandParameter="Library" ToolTip="管理并检索题库中的题目">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentRoute}" Value="Library">
+                                    <Setter Property="Background" Value="#E0E0E0"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="BookMultiple" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="题目库" VerticalAlignment="Center" FontWeight="Medium"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding NavigateCommand}" CommandParameter="Export" ToolTip="生成HTML并导出成PDF试卷">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentRoute}" Value="Export">
+                                    <Setter Property="Background" Value="#E0E0E0"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Printer" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="组卷导出" VerticalAlignment="Center" FontWeight="Medium"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding NavigateCommand}" CommandParameter="Settings" ToolTip="配置AI大模型接口与密钥">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentRoute}" Value="Settings">
+                                    <Setter Property="Background" Value="#E0E0E0"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Cog" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="系统设置" VerticalAlignment="Center" FontWeight="Medium"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Border>
 
         <!-- Main Content -->
-        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" Margin="20"/>
+        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" Margin="0"/>
     </Grid>
 </Window>
